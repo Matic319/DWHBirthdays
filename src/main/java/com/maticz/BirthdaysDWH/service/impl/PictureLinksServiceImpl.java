@@ -100,7 +100,7 @@ public class PictureLinksServiceImpl implements PictureLinksService {
                         birthdayPictures.setPictureLink(pictureLink);
                         birthdayPictures.setIdLocation(idLocation);
                         birthdayPictures.setImportTimestamp(LocalDateTime.now());
-                        birthdayPictures.setUpdateLink(0); // Spremen v 1 pol !
+                        birthdayPictures.setUpdateLink(1);
                         birthdayPictures.setEmailOpened(0);
                         birthdayPictures.setEmailSentFromAC(0);
                         switch(idLocation) {
