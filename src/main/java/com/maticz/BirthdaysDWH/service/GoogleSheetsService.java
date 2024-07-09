@@ -20,5 +20,5 @@ public interface GoogleSheetsService {
 
     void appendToSheetLastRow(String spreadsheetId, String range , String data) throws IOException;
 
-
+    void clearAndInsertValues(String spreadsheetId, String sheetName, String range, List<List<Object>> values) throws IOException;
 }

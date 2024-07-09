@@ -23,6 +23,7 @@ public interface BirthdaysRepository extends JpaRepository<Birthdays,Long> {
     Optional<Birthdays> findByParentEmailAndDateFromAndChildFirstNameAndIdLocation(String parentEmail, LocalDateTime dateFrom, String childFirstName, Integer idLocation);
 
 
+
     Optional<Birthdays> findByParentEmailAndDateFromAndIdLocationAndActiveAndChildFirstName(String parentEmail, LocalDateTime datefrom , Integer idLocation, Integer active , String childFirstName);
 
 

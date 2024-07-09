@@ -1,9 +1,8 @@
 package com.maticz.BirthdaysDWH.service.impl;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 import com.maticz.BirthdaysDWH.service.GoogleSheetsService;
 import org.springframework.stereotype.Service;
 
@@ -97,5 +96,32 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         return values;
     }
 
+    public void clearAndInsertValues(String spreadsheetId, String sheetName, String range, List<List<Object>> values) throws IOException {
+        String fullRange = sheetName + "!" + range;
+
+        try {
+            ClearValuesRequest clearRequest = new ClearValuesRequest();
+            ClearValuesResponse clearResponse = sheetsService.spreadsheets().values()
+                    .clear(spreadsheetId, fullRange, clearRequest)
+                    .execute();
+
+            ValueRange body = new ValueRange()
+                    .setValues(values);
+
+            UpdateValuesResponse updateResponse = sheetsService.spreadsheets().values()
+                    .update(spreadsheetId, fullRange, body)
+                    .setValueInputOption("USER_ENTERED")
+                    .execute();
+
+            System.out.printf("%d cells updated.\n", updateResponse.getUpdatedCells());
+
+        } catch (GoogleJsonResponseException e) {
+            System.err.println("Error updating sheet: " + e.getDetails());
+            throw e;
+        } catch (IOException e) {
+            System.err.println("An IO error occurred: " + e.getMessage());
+            throw e;
+        }
+    }
 
 }

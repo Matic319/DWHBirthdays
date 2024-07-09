@@ -992,7 +992,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
             LocalDateTime dateTo = LocalDateTime.of(date, endTime);
             Integer locationId = idLocation;
 
-            if (date.equals(LocalDate.now().minusDays(1))) {
+
 
                 if (parentEmail == null || parentEmail.isBlank()) {
                     dontSave = true;
@@ -1013,11 +1013,18 @@ public class BirthdayServiceImpl implements BirthdaysService {
                         errorToDB.setParentEmail(parentEmail);
                         errorToDB.setErrorField(errorField);
                         errorToDB.setErrorMessage(errorMessage);
-                        errorLogRepository.save(errorToDB);
+                        /*errorLogRepository.save(errorToDB);*/   //Od komentiri ce rabs errorLog
                     }
-                    birthdaysRepository.save(birthday);
+                    try {
+                        if (birthdaysRepository.findByParentEmailAndDateFromAndChildFirstNameAndIdLocation(parentEmail, dateFrom, childFirstName, idLocation).isEmpty()) {
+                            birthdaysRepository.save(birthday);
+                        }
+                    }catch (Exception e) {
+                        logger.info("error" + e.getMessage());
+
                     }
-                }
+                    }
+
             }
         }
 

@@ -14,4 +14,5 @@ BirthdaysDwhApplication {
 		SpringApplication.run(BirthdaysDwhApplication.class, args);
 	}
 
+
 }

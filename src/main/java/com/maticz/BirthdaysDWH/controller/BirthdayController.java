@@ -2,11 +2,9 @@ package com.maticz.BirthdaysDWH.controller;
 
 import com.maticz.BirthdaysDWH.model.Birthdays;
 import com.maticz.BirthdaysDWH.repository.BirthdaysRepository;
+import com.maticz.BirthdaysDWH.service.ACService;
 import com.maticz.BirthdaysDWH.service.BirthdaysService;
-import com.maticz.BirthdaysDWH.service.impl.BirthdayCancelationServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.BirthdayServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.GoogleSheetsServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.PictureLinksServiceImpl;
+import com.maticz.BirthdaysDWH.service.impl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,9 @@ public class BirthdayController {
 
     @Autowired
     PictureLinksServiceImpl pictureLinksService;
+
+    @Autowired
+    ACServiceImpl acService;
 
 
     Logger logger = LoggerFactory.getLogger(BirthdayController.class);
@@ -152,7 +153,6 @@ public class BirthdayController {
         birthdayServiceImpl.mapSheetImportSaveToDB("1PMfyZBdvZaerqX86GZoZF27HAr92OgoYm6bSsvBKGdo","RD Rudnik",5);
         return ResponseEntity.ok("ok");
     }
-    @Scheduled(cron = "0 42 6 * * *")
     @GetMapping("importMS")
     public ResponseEntity<String> importMS() throws IOException {
 
@@ -306,18 +306,14 @@ public class BirthdayController {
         return ResponseEntity.ok("ok");
     }
 
-    @GetMapping("/pictureLink")
-    public ResponseEntity<String> getPictureLinks() throws IOException {
-        pictureLinksService.mapSheetAndSaveToDB("1mbEZtS329eu7miy42dWSIvECvjHeNosIOALv-S236a8","Trampolin park",1);
+
+
+
+    @GetMapping("/writeTEST")
+    public ResponseEntity<String> testWrite() throws IOException{
+        acService.sendToACPictureLink("matic.zigon@woop.fun","test.com");
         return ResponseEntity.ok("ok");
     }
-
-    @GetMapping("/write")
-    public ResponseEntity<String> write() throws IOException {
-        pictureLinksService.updatePictureLinkInAC(1);
-        return ResponseEntity.ok("ok");
-    }
-
 
     }
 

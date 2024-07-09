@@ -2,8 +2,9 @@ package com.maticz.BirthdaysDWH.service.impl;
 
 import com.maticz.BirthdaysDWH.model.BirthdayPictures;
 import com.maticz.BirthdaysDWH.repository.BirthdayPicturesRepository;
-import com.maticz.BirthdaysDWH.repository.BirthdaysRepository;
 import com.maticz.BirthdaysDWH.service.PictureLinksService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
@@ -14,8 +15,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 public class PictureLinksServiceImpl implements PictureLinksService {
@@ -33,9 +35,8 @@ public class PictureLinksServiceImpl implements PictureLinksService {
     DateTimeFormatter formatterDMYOnly = DateTimeFormatter.ofPattern("d. M. yyyy");
     DateTimeFormatter formatterHMSOnly = DateTimeFormatter.ofPattern("HH:mm:ss");
     DateTimeFormatter formatterHMOnly = DateTimeFormatter.ofPattern("HH:mm");
-    DateTimeFormatter formatterSQL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-    Logger logger = Logger.getLogger(PictureLinksServiceImpl.class.getName());
+    DateTimeFormatter formatterSQL = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.S][.SS][.SSS]");
+    Logger logger = LoggerFactory.getLogger(PictureLinksServiceImpl.class.getName());
 
 
 
@@ -120,15 +121,62 @@ public class PictureLinksServiceImpl implements PictureLinksService {
         }
     }
 
-  @Override
-public void updatePictureLinkInAC(Integer idLocation) throws IOException {
-    List<Object[]> emailAndLinkList = birthdayPicturesRepository.getEmailAndLink();
-    for (Object[] row : emailAndLinkList) {
-        try {
-            acService.sendToACPictureLink(row[0].toString(), row[1].toString());
-            birthdayPicturesRepository.updateLink(idLocation, LocalDateTime.parse(row[2].toString(), formatterSQL), row[0].toString());
-        } catch (HttpServerErrorException.BadGateway e) {
+    @Override
+    public void updatePictureLinkInAC(Integer idLocation) throws IOException {
+        List<Object[]> emailAndLinkList = birthdayPicturesRepository.getEmailAndLink(idLocation);
+        logger.info(emailAndLinkList.toString());
+        for (Object[] row : emailAndLinkList) {
+            try {
+                logger.info(row[0].toString() + " " + row[1].toString());
+                acService.sendToACPictureLink(row[0].toString(), row[1].toString());
+                LocalDateTime date = LocalDateTime.parse(row[2].toString(), formatterSQL);
+                birthdayPicturesRepository.updateLink(idLocation, date, row[0].toString());
+            } catch (HttpServerErrorException.BadGateway e) {
+                logger.info("Bad gateway: {}", e.getMessage());
+            } catch (Exception e) {
+                logger.error("Error updating picture link in AC: {}", e.getMessage());
+            }
         }
     }
+
+    @Override
+    public void updateEmailSentAndEmailOpened() {
+        List<Object[]> listToUpdate = birthdayPicturesRepository.getContactEmailAndDateFromAndIdLocationAndEmailOpenedAndSentWhereSentAndOpenedZero();
+
+        for(Object[] row : listToUpdate) {
+            if(row[5] != null) {
+                birthdayPicturesRepository.updateEmailSentFromAC(row[0].toString(), LocalDateTime.parse(row[1].toString(),formatterSQL), Integer.parseInt(row[2].toString()));
+            }
+            if(row[4] != null) {
+                birthdayPicturesRepository.updateEmailOpened(row[0].toString(), LocalDateTime.parse(row[1].toString(),formatterSQL), Integer.parseInt(row[2].toString()));
+            }
+        }
+    }
+
+    @Override
+    public void writeToSheetBasedOnQuerry(Integer idLocation, String sheetId) throws IOException {
+
+        List<Object[]> values = birthdayPicturesRepository.getContactEmailAndDateFromAndIdLocationAndEmailOpenedAndSent(idLocation);
+
+        List<List<Object>> listValues = new ArrayList<>();
+        listValues.add(Arrays.asList("datum RD","email","poslan mail", "odprt mail", "posodobljeno"));
+        listValues.add(Arrays.asList(" "," "," "," ",LocalDateTime.now().toString()));
+        for (Object[] row : values) {
+            String emailSent = switch (row[6].toString()) {
+                case "1" -> "JA";
+                case "0" -> "NE";
+                default -> null;
+            };
+
+            String emailOpened = switch (row[7].toString()) {
+                case "1" -> "JA";
+                case "0" -> "NE";
+                default -> null;
+            };
+            listValues.add(Arrays.asList(row[1].toString(), row[0].toString(), emailSent , emailOpened));
+        }
+        googleSheetsService.clearAndInsertValues(sheetId,"Slike","A1:O999",listValues);
+
+    }
 }
-}
+
