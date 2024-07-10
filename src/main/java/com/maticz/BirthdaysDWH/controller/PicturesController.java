@@ -1,10 +1,6 @@
 package com.maticz.BirthdaysDWH.controller;
 
-import com.maticz.BirthdaysDWH.service.PdfTextInsertionService;
-import com.maticz.BirthdaysDWH.service.impl.ACServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.BirthdayCancelationServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.BirthdayServiceImpl;
-import com.maticz.BirthdaysDWH.service.impl.PictureLinksServiceImpl;
+import com.maticz.BirthdaysDWH.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +27,7 @@ public class PicturesController {
     ACServiceImpl acService;
 
     @Autowired
-    PdfTextInsertionService pdfTextInsertionService;
+    PdfTextInsertionServiceImpl pdfTextInsertionService;
 
     @Scheduled(cron = "0 30 */2 * * *")
     @GetMapping("/TP")
@@ -77,7 +73,8 @@ public class PicturesController {
     @GetMapping("/test")
     public ResponseEntity<String> test() throws IOException {
         pdfTextInsertionService.insertTextIntoPdf("C:\\Users\\Matic\\Desktop\\Vabilo_rojstni_dan_OSNOVNI FILE_2023.pdf","C:\\Users\\Matic\\Desktop\\test.pdf",
-                "10","2024-06-06", "17:00","Fun park","Leskoskova cesta 2","0311231231");
-    return  ResponseEntity.ok("ok");
+                "10","2024-06-06", "17:00","0311231231", "test",1);
+
+        return ResponseEntity.ok("ok");
     }
 }
