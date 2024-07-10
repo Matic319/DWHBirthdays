@@ -116,7 +116,6 @@ public class PictureLinksServiceImpl implements PictureLinksService {
                             birthdayPicturesRepository.save(birthdayPictures);
                         }
                 }
-
             }
         }
     }

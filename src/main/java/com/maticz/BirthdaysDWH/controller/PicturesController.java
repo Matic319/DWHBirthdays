@@ -1,5 +1,6 @@
 package com.maticz.BirthdaysDWH.controller;
 
+import com.maticz.BirthdaysDWH.service.PdfTextInsertionService;
 import com.maticz.BirthdaysDWH.service.impl.ACServiceImpl;
 import com.maticz.BirthdaysDWH.service.impl.BirthdayCancelationServiceImpl;
 import com.maticz.BirthdaysDWH.service.impl.BirthdayServiceImpl;
@@ -28,6 +29,9 @@ public class PicturesController {
 
     @Autowired
     ACServiceImpl acService;
+
+    @Autowired
+    PdfTextInsertionService pdfTextInsertionService;
 
     @Scheduled(cron = "0 30 */2 * * *")
     @GetMapping("/TP")
@@ -68,5 +72,12 @@ public class PicturesController {
         pictureLinksService.mapSheetAndSaveToDB("1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY","Arena",3);
         pictureLinksService.updateEmailSentAndEmailOpened();
         return ResponseEntity.ok("ok");
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() throws IOException {
+        pdfTextInsertionService.insertTextIntoPdf("C:\\Users\\Matic\\Desktop\\Vabilo_rojstni_dan_OSNOVNI FILE_2023.pdf","C:\\Users\\Matic\\Desktop\\test.pdf",
+                "10","2024-06-06", "17:00","Fun park","Leskoskova cesta 2","0311231231");
+    return  ResponseEntity.ok("ok");
     }
 }
