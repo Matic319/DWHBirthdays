@@ -29,6 +29,12 @@ public class PicturesController {
     @Autowired
     PdfTextInsertionServiceImpl pdfTextInsertionService;
 
+    @Autowired
+    BirthdayInvitationsServiceImpl birthdayInvitationsService;
+
+    @Autowired
+    MailSendingServiceImpl mailSendingService;
+
     @Scheduled(cron = "0 30 */2 * * *")
     @GetMapping("/TP")
     public ResponseEntity<String> getPictureTP() throws IOException {
@@ -62,19 +68,29 @@ public class PicturesController {
         pictureLinksService.writeToSheetBasedOnQuerry(2,sheetID);
         return ResponseEntity.ok("ok");
     }
-
+    @Scheduled(cron = "0 25 */2 * * *")
     @GetMapping("/Arena")
     public ResponseEntity<String> getPicturesArena() throws IOException{
-        pictureLinksService.mapSheetAndSaveToDB("1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY","Arena",3);
+
+        String sheetID = "1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY";
+        pictureLinksService.mapSheetAndSaveToDB(sheetID,"Arena",3);
+        pictureLinksService.updatePictureLinkInAC(3);
         pictureLinksService.updateEmailSentAndEmailOpened();
+        pictureLinksService.writeToSheetBasedOnQuerry(3,sheetID);
         return ResponseEntity.ok("ok");
     }
 
     @GetMapping("/test")
     public ResponseEntity<String> test() throws IOException {
-        pdfTextInsertionService.insertTextIntoPdf("C:\\Users\\Matic\\Desktop\\Vabilo_rojstni_dan_OSNOVNI FILE_2023.pdf","C:\\Users\\Matic\\Desktop\\test.pdf",
-                "10","2024-06-06", "17:00","0311231231", "test",1);
 
+        mailSendingService.sendBirthdayInvitationsEmail(1);
+
+        return ResponseEntity.ok("ok");
+    }
+
+    @GetMapping("/invite")
+    public ResponseEntity<String> invite() throws IOException {
+        birthdayInvitationsService.mapAndSaveToInvitations("1mbEZtS329eu7miy42dWSIvECvjHeNosIOALv-S236a8","Trampolin park",1);
         return ResponseEntity.ok("ok");
     }
 }

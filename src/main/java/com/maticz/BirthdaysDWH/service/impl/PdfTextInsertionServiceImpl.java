@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Service
 public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
@@ -25,11 +27,11 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
     private String locationName(Integer idLocation){
         return switch(idLocation) {
-            case 1 -> "Woop! Fun park";
-            case 2 -> "Woop! Karting & Glow golf";
-            case 3 -> "Woop! Arena";
-            case 5 -> "Woop! Izzivi";
-            case 6 -> "Woop! Maribor";
+            case 1 -> "WOOP! Fun park";
+            case 2 -> "WOOP! Karting & Glow golf";
+            case 3 -> "WOOP! Arena";
+            case 5 -> "WOOP! Izzivi";
+            case 6 -> "WOOP! Maribor";
             default -> throw new IllegalStateException("wrong idLocation: " + idLocation);
         };
     }
@@ -70,48 +72,46 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
     }
 
     @Override
-    public void insertTextIntoPdf(String inputFilePath, String outputFilePath, String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException {
+    public void insertTextIntoPdf(String outputFilePath, String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException {
+        try (InputStream inputStream = getClass().getResourceAsStream("/vabilo_template.pdf")) {
+            PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
 
-            try (PDDocument document = Loader.loadPDF(new File(inputFilePath))) {
-                PDPage page = document.getPage(0);
-                PDRectangle pageSize = page.getMediaBox();
-                float pageHeightInPoints = pageSize.getHeight();
+            PDPage page = document.getPage(0);
+            PDRectangle pageSize = page.getMediaBox();
+            float pageHeightInPoints = pageSize.getHeight();
 
-                try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                    contentStream.setNonStrokingColor(1f, 1f, 1f);
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+                contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                    insertText(contentStream, age, 1.25f, 5.3f, pageHeightInPoints, 110);
-                    insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
-                    insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
-                    insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
-                    insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28);
-                    insertText(contentStream, phone , 2.8f, 8.42f, pageHeightInPoints,30);
+                insertText(contentStream, age, 1.25f, 5.3f, pageHeightInPoints, 110);
+                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
+                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
+                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
+                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28);
+                insertText(contentStream, convertPhoneNumber(phone) , 2.8f, 8.42f, pageHeightInPoints,30);
 
-                    if(childName.contains(" in")){
-
-                        insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
-                        insertText(contentStream, childName.split(" ")[1], 5.7f,11.2f, pageHeightInPoints,30);
-                        insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
-
-                    }if(childName.length() > 14){
-                        insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
-                        insertText(contentStream, childName.split(" ")[1], 5.6f,11.2f, pageHeightInPoints,30);
-                        insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
-
-                    }if(childName.length() < 8) {
-                        insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50);
-                    } else {
-                        insertText(contentStream, childName,5.1f,11.3f, pageHeightInPoints, 30);
-                    }
+                if(childName.contains(" in ") || childName.contains("&")){
+                    insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[1], 5.7f,11.2f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
+                } else if(childName.length() > 14){
+                    insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[1], 5.6f,11.2f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
+                } else if(childName.length() < 8) {
+                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50);
+                } else {
+                    insertText(contentStream, childName,5.1f,11.3f, pageHeightInPoints, 30);
                 }
-
-                document.save(outputFilePath);
             }
-        }
 
+            document.save(outputFilePath);
+            document.close();
+        }
+    }
 
     @Override
-    public void convertPdfToJpg(String inputFilePath, String outputFilePrefix, int dpi) throws IOException {
+    public void convertPdfToJpgAndSave(String inputFilePath, String outputFilePrefix, int dpi) throws IOException {
         try (PDDocument document = Loader.loadPDF(new File(inputFilePath))) {
             PDFRenderer renderer = new PDFRenderer(document);
 
@@ -121,6 +121,79 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
                 ImageIO.write(image, "jpg", new File(outputFilePath));
             }
         }
+    }
+@Override
+    public byte[] createAndConvertPdfToJpg(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException {
+        byte[] pdfBytes = createPdfInMemory(age, dateFrom, time, phone, childName, idLocation);
+        return convertPdfToJpg(pdfBytes, 600);
+    }
+@Override
+    public byte[] createPdfInMemory(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException {
+        try (InputStream inputStream = getClass().getResourceAsStream("/vabilo_template.pdf");
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
+            PDPage page = document.getPage(0);
+            PDRectangle pageSize = page.getMediaBox();
+            float pageHeightInPoints = pageSize.getHeight();
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+                contentStream.setNonStrokingColor(1f, 1f, 1f);
+
+                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110);
+                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
+                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
+                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
+                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28);
+                insertText(contentStream, convertPhoneNumber(phone), 2.8f, 8.42f, pageHeightInPoints, 30);
+
+                if(childName.contains(" in ") || childName.contains("&")){
+                    insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[1], 5.7f,11.2f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
+                } else if(childName.length() > 14){
+                    insertText(contentStream, childName.split(" ")[0], 5.35f,10.7f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[1], 5.6f,11.2f, pageHeightInPoints,30);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f,11.65f, pageHeightInPoints,30);
+                } else if(childName.length() < 8) {
+                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50);
+                } else {
+                    insertText(contentStream, childName,5.1f,11.3f, pageHeightInPoints, 30);
+                }
+            }
+
+            document.save(outputStream);
+            document.close();
+
+            return outputStream.toByteArray();
+        }
+    }
+
+    public byte[] convertPdfToJpg(byte[] pdfBytes, int dpi) throws IOException {
+        try (PDDocument document = Loader.loadPDF(pdfBytes);
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            PDFRenderer renderer = new PDFRenderer(document);
+            BufferedImage image = renderer.renderImageWithDPI(0, dpi);
+            ImageIO.write(image, "jpg", outputStream);
+
+            return outputStream.toByteArray();
+        }
+    }
+
+    @Override
+    public String convertPhoneNumber(String phone) {
+
+        String phoneNumber = phone.trim().replaceAll("\\s", "");
+        if (phoneNumber.startsWith("+386") || phoneNumber.startsWith("00386")) {
+            phoneNumber = "0" + phoneNumber.substring(phoneNumber.length() - 8);
+            phoneNumber = phoneNumber.substring(0,3) + " " + phoneNumber.substring(3,6) + " " + phoneNumber.substring(6);
+        }if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("+386") && !phoneNumber.startsWith("00") && phoneNumber.length() != 9){
+            phoneNumber = "0" + phoneNumber.substring(1,3) + " " + phoneNumber.substring(3,6) + " " + phoneNumber.substring(6);
+        }else {
+            phoneNumber = phoneNumber.substring(0,3) + " " + phoneNumber.substring(3,6) + " " + phoneNumber.substring(6);
+        }
+        return phoneNumber;
     }
 }
 

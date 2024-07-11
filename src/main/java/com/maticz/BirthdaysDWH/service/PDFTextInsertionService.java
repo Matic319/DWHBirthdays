@@ -7,9 +7,15 @@ import java.io.IOException;
 @Service
 public interface PDFTextInsertionService {
 
-     void insertTextIntoPdf(String inputFilePath, String outputFilePath, String age,
+     void insertTextIntoPdf( String outputFilePath, String age,
                                   String dateFrom, String time,
                                   String phone, String childName, Integer idLocation) throws IOException;
 
-     void convertPdfToJpg(String inputFilePath, String outputFilePrefix, int dpi) throws IOException;
+     void convertPdfToJpgAndSave(String inputFilePath, String outputFilePrefix, int dpi) throws IOException;
+
+     byte[] createPdfInMemory(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException;
+
+     String convertPhoneNumber(String phone);
+
+      byte[] createAndConvertPdfToJpg(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException;
 }
