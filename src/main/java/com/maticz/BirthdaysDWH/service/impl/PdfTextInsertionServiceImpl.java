@@ -83,7 +83,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                 contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                insertText(contentStream, age, 1.25f, 5.3f, pageHeightInPoints, 110);
+                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110);
                 insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
                 insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
                 insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
