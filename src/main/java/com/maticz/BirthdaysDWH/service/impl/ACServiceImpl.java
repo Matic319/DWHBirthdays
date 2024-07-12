@@ -174,8 +174,6 @@ public class ACServiceImpl implements ACService {
              String date = dateFrom.toLocalDate().toString();
             JsonNode node = getContactActivitiesAfterDate(idSubscriberString, date);
 
-            System.out.println(node.toString());
-
             if (node.has("logs")) {
                 JsonNode logs = node.path("logs");
                 for (JsonNode log : logs) {
@@ -184,8 +182,6 @@ public class ACServiceImpl implements ACService {
 
                     OffsetDateTime originalTimestamp = OffsetDateTime.parse(tstamp, formatterISOOffset);
                     LocalDateTime convertedTimestamp = originalTimestamp.atZoneSameInstant(ZoneId.of("Europe/Ljubljana")).toLocalDateTime();
-
-                    System.out.println("Campaign logs ID: " + logsIdCampaign + ", campaignId:" + idCampaign + ", TimestampConverted: " + convertedTimestamp + "date:" + date);
 
                     if (logsIdCampaign.equals(idCampaign) && convertedTimestamp.toLocalDate().isAfter(LocalDate.parse(date).minusDays(1))) {
                         birthdayPicturesRepository.updateEmailSentFromAC(email,dateFrom,idCampaign);
