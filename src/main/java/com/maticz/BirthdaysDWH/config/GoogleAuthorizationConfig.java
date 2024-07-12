@@ -7,6 +7,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import org.springframework.context.annotation.Bean;
@@ -105,4 +106,5 @@ public class GoogleAuthorizationConfig {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
+
 }
