@@ -47,7 +47,7 @@ public class MailSendingServiceImpl implements MailSendingService {
             try {
                 byte[] jpgData = pdfTextInsertionService.createAndConvertPdfToJpg(age, date, time, phone, childName, idLocation);
                 sendEmail("matic.zigon@woop.fun", childName, jpgData);
-                birthdayInvitationsRepository.updateEmailSent(1,dateTime,"matic.zigon@woop.fun");
+                birthdayInvitationsRepository.updateEmailSent(1,dateTime,"matic.zigon@woop.fun",childName);
 
 
             } catch (Exception e) {

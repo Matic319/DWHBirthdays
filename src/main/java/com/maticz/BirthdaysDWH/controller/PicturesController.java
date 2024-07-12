@@ -105,7 +105,7 @@ public class PicturesController {
     @GetMapping("/testCalendar")
     public ResponseEntity<String> testCalendar() throws Exception {
 
-       String url = googleCalendarInviteService.sendBirthdayInviteAndGetLink("test 2", LocalDateTime.of(LocalDate.of(2024,7,17), LocalTime.of(15,30))," lokacija","klavdija.levstek@woop.fun",3);
+       String url = googleCalendarInviteService.sendBirthdayInviteAndGetLink("test 2", LocalDateTime.of(LocalDate.of(2024,7,17), LocalTime.of(15,30))," lokacija","klavdija.levstek@woop.fun",3,15);
         return ResponseEntity.ok("ok");
     }
 

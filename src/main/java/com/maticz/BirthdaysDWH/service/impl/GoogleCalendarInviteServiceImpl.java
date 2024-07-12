@@ -98,14 +98,21 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
         return null;
     }
 
+    @Override
+    public void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception {
+        String eventURL = sendBirthdayInviteAndGetLink(childName, eventDateTime, location, guestEmail, durationHours,durationMinutes);
+        String eventId = extractEventId(eventURL);
+
+    }
+
     private Integer emailResponseToInt(String response) {
-        Integer responseInt = switch (response) {
+        return switch (response) {
             case "accepted" ->1;
             case "declined" ->0;
             case "needsAction" ->-1;
 
             default -> 2;
-        }; return responseInt;
+        };
     }
 }
 

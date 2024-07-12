@@ -1,5 +1,6 @@
 package com.maticz.BirthdaysDWH.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.maticz.BirthdaysDWH.model.BirthdayPictures;
 import com.maticz.BirthdaysDWH.repository.BirthdayPicturesRepository;
 import com.maticz.BirthdaysDWH.service.PictureLinksService;
@@ -139,7 +140,7 @@ public class PictureLinksServiceImpl implements PictureLinksService {
     }
 
     @Override
-    public void updateEmailSentAndEmailOpened() {
+    public void updateEmailSentAndEmailOpened() throws JsonProcessingException {
         List<Object[]> listToUpdate = birthdayPicturesRepository.getContactEmailAndDateFromAndIdLocationAndEmailOpenedAndSentWhereSentAndOpenedZero();
 
         for(Object[] row : listToUpdate) {
@@ -148,6 +149,9 @@ public class PictureLinksServiceImpl implements PictureLinksService {
             }
             if(row[4] != null) {
                 birthdayPicturesRepository.updateEmailOpened(row[0].toString(), LocalDateTime.parse(row[1].toString(),formatterSQL), Integer.parseInt(row[2].toString()));
+            }
+            if(Integer.parseInt(row[6].toString()) == 0) {
+                acService.updateEmailSentIfMatchFoundInActivities(row[0].toString(), LocalDateTime.parse(row[1].toString(), formatterSQL), Integer.valueOf(row[2].toString()));
             }
         }
     }

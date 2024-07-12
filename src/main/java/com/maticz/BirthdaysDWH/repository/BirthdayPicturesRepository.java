@@ -73,4 +73,8 @@ void updateLink(@Param("idLocation") Integer idLocation,
     void updateEmailOpened(@Param("parentEmail") String parentEmail,
                               @Param("dateFrom") LocalDateTime dateFrom,
                               @Param("idCampaign") Integer idCampaign);
+
+    @Query
+            (value = "select top 1 idsubscriber from AC_fact_emails where email = :email ", nativeQuery = true)
+    Integer getIdSubscriber(@Param("email") String email);
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 
 import java.time.LocalDateTime;
 
@@ -42,5 +43,16 @@ public class BirthdayInvitations {
 
     @Column(name = "importTimestamp")
     private LocalDateTime importTimestamp;
+
+    @Column(name = "animatorEmail")
+    private String animatorEmail;
+
+    @Column(name = "animatorInviteSent")
+    private Integer animatorInviteSent;
+
+    @Column(name = "animatorInviteResponse")
+    private String animatorInviteResponse;
+
+
 
 }

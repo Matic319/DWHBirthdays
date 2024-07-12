@@ -16,5 +16,5 @@ public interface GoogleCalendarInviteService {
 
     String extractEventId(String urlString);
 
-
+    void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception;
 }

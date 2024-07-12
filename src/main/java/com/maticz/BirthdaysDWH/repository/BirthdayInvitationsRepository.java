@@ -28,8 +28,21 @@ public interface BirthdayInvitationsRepository extends JpaRepository<BirthdayInv
     @Query
             (value ="update birthdayInvitations " +
                     "set emailSent = 1" +
-                    " where email = :email and dateFrom = convert(datetime,:dateFrom,121) and idLocation = :idLocation " , nativeQuery = true)
+                    " where email = :email and dateFrom = convert(datetime,:dateFrom,121) and idLocation = :idLocation and childName = :childName" , nativeQuery = true)
     void updateEmailSent(@Param("idLocation") Integer idLocation,
                          @Param("dateFrom") LocalDateTime dateFrom,
-                         @Param("email") String email);
+                         @Param("email") String email,
+                         @Param("childName") String childName);
+
+
+    @Transactional
+    @Modifying
+    @Query
+            (value ="update birthdayInvitations " +
+                    "set animatorInviteSent = 1" +
+                    " where email = :email and dateFrom = convert(datetime,:dateFrom,121) and idLocation = :idLocation and childName = :childName" , nativeQuery = true)
+    void updateAnimatorInviteSentToTrue(@Param("email") String email, @Param("dateFrom") LocalDateTime dateFrom,
+                                  @Param("idLocation") Integer idLocation, @Param("childName") String childName);
+
+
 }
