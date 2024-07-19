@@ -116,7 +116,7 @@ public class SummerCampImpl implements SummerCampService {
                 smrcmp.setDiscount(discount);
                 smrcmp.setIdLocation(idLocation);
 
-                if(cancellation == true){
+                if(cancellation){
                     smrcmp.setCancel(1);
                 }else {
                     smrcmp.setCancel(0);

@@ -17,6 +17,7 @@ public interface BirthdayPicturesRepository extends JpaRepository<BirthdayPictur
 
     Optional<BirthdayPictures> findByEmailAndDateFromAndIdLocation(String email, LocalDateTime dateFrom, Integer idLocation);
 
+
     @Query
             (value = " select parentEmail , picturelink , dateFrom from birthdayPictures \n" +
                     "where updateLink = 1 and idLocation = :idLocation \n ", nativeQuery = true)

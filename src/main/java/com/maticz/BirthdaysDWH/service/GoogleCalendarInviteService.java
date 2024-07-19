@@ -10,11 +10,15 @@ import java.util.HashMap;
 public interface GoogleCalendarInviteService {
 
 
-    String sendBirthdayInviteAndGetLink(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception;
 
     HashMap<String,Integer> checkGuestResponse(String eventId, String calendarId) throws IOException;
 
-    String extractEventId(String urlString);
+    void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location,
+                                       String guestEmail, Integer durationHours, Integer durationMinutes,
+                                       Integer idLocation, String description, String parentEmail, Boolean extraAnimator) throws Exception;
 
-    void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception;
+    String sendBirthdayInviteAndGetEventId(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHoursAnimator,
+                                           Integer durationMinutesAnimator, String description) throws Exception;
+
+    void getResponseAndSaveToDB(String eventId, String calendarId, Boolean extraAnimator, String animatorEmail) throws IOException;
 }

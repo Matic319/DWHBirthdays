@@ -20,8 +20,8 @@ public class SummerCampController {
     @Scheduled(cron = "0 0 */2 * * *")  // na vsaki 2 uri
     @GetMapping("/summerCamp")
     ResponseEntity<String> test1() throws IOException {
-        summerCampService.mapSheetHolidaysAndSaveToDBAndAC("1aK7ZyNmDwEtJkzHeevWfI2P2iV4mO9MHgUAq82ZZ8oI","Master prijave","A2:O400", 1);
-        summerCampService.mapSheetHolidaysAndSaveToDBAndAC("1dGeMbGrTDMsxxENyxgAcvZ3L_mID1gXo4NkpgsUTPSY","Master prijave", "A2:O400",6);
+        summerCampService.mapSheetHolidaysAndSaveToDBAndAC("1aK7ZyNmDwEtJkzHeevWfI2P2iV4mO9MHgUAq82ZZ8oI","Master prijave","A2:O1500", 1);
+        summerCampService.mapSheetHolidaysAndSaveToDBAndAC("1dGeMbGrTDMsxxENyxgAcvZ3L_mID1gXo4NkpgsUTPSY","Master prijave", "A2:O1500",6);
         return ResponseEntity.ok("ok");
     }
 

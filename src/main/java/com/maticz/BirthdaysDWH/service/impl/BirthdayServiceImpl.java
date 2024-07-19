@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class BirthdayServiceImpl implements BirthdaysService {
 
-    private BirthdaysRepository birthdaysRepository;
+    private final BirthdaysRepository birthdaysRepository;
 
     BirthdayServiceImpl(BirthdaysRepository birthdaysRepository) {
         this.birthdaysRepository = birthdaysRepository;
@@ -1007,7 +1007,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
                     /*if(birthdaysRepository.findByParentEmailAndDateFrom(parentEmail,dateFrom).isEmpty()) {
                         birthdaysRepository.save(birthday);
                     }*/
-                    if(error = true || idBDayProgType == 0 ){
+                    if(error = true){
                         errorToDB.setDateFrom(dateFrom);
                         errorToDB.setDateTo(dateTo);
                         errorToDB.setParentEmail(parentEmail);
@@ -1221,7 +1221,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
                             partyPlaceName, idBDayProgType);
 
 
-                    if(error = true || idBDayProgType == 0 ){
+                    if(error = true){
                         errorToDB.setErrorField(errorField);
                         errorToDB.setErrorMessage(errorMessage);
                         errorLogRepository.save(errorToDB);
@@ -1419,7 +1419,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
         dateTime.forEach((date,time) -> {
             try {
                 i.getAndSet(i.get() + 1);
-                googleSheetsService.writeToSheet("1uYbtQ7tmswedrL4cHRsS956Cz_RDpvQSgjNpelJ3NYQ","A" + i.toString() + ":B" +i.toString(), date + " " + time);
+                googleSheetsService.writeToSheet("1uYbtQ7tmswedrL4cHRsS956Cz_RDpvQSgjNpelJ3NYQ","A" + i + ":B" + i, date + " " + time);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

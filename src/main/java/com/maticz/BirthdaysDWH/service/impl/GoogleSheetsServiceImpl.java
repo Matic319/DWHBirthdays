@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -21,8 +22,8 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
 
     @Override
     public void writeToSheet(String spreadsheetId, String range , String data) throws IOException {
-        List<List<Object>> values = Arrays.asList(
-                Arrays.asList(data)
+        List<List<Object>> values = List.of(
+                Collections.singletonList(data)
         );
 
         ValueRange body = new ValueRange().setValues(values);
@@ -35,8 +36,8 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
 
     @Override
     public void appendToSheetLastRow(String spreadsheetId, String range , String data) throws IOException {
-        List<List<Object>> values = Arrays.asList(
-                Arrays.asList(data)
+        List<List<Object>> values = List.of(
+                Collections.singletonList(data)
         );
 
         ValueRange body = new ValueRange().setValues(values);

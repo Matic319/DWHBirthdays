@@ -102,28 +102,24 @@ public class PicturesController {
         return ResponseEntity.ok("ok");
     }
 
-    @GetMapping("/testCalendar")
-    public ResponseEntity<String> testCalendar() throws Exception {
 
-       String url = googleCalendarInviteService.sendBirthdayInviteAndGetLink("test 2", LocalDateTime.of(LocalDate.of(2024,7,17), LocalTime.of(15,30))," lokacija","klavdija.levstek@woop.fun",3,15);
-        return ResponseEntity.ok("ok");
-    }
 
     @GetMapping("/responseTest")
     public ResponseEntity<String> checkResponse() {
         try {
-            googleCalendarInviteService.checkGuestResponse("6gmflm8jghjlugtm1qm3b0s670", "matic.zigon@woop.fun");
-            googleCalendarInviteService.checkGuestResponse("b7lul1pu94s9t8r3mpu1g5vres", "matic.zigon@woop.fun");
-            googleCalendarInviteService.checkGuestResponse("s5v5at4mvbpcta8b46dtb5693o", "matic.zigon@woop.fun");
-
-            /*Attendee klavdija.levstek@woop.fun response: accepted
-            Attendee klavdija.levstek@woop.fun response: declined
-            Attendee klavdija.levstek@woop.fun response: needsAction*/
+            googleCalendarInviteService.checkGuestResponse("gdb8jjhadtn7omnqk17e5o6pnk", "matic.zigon@woop.fun");
 
             return ResponseEntity.ok("Check console for attendee responses");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error checking responses: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/inviteTest")
+    public ResponseEntity<String> inviteTest() throws Exception {
+
+        birthdayInvitationsService.mapAndSaveToInvitations("1yOuM05L6YPadJ8cZ8WDghtdZZLaDAXvXlJOlUqG9zrI","Test",7);
+        return ResponseEntity.ok("ok");
     }
 }

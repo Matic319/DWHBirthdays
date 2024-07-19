@@ -5,14 +5,12 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.maticz.BirthdaysDWH.repository.BirthdayInvitationsRepository;
 import com.maticz.BirthdaysDWH.service.GoogleCalendarInviteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -20,6 +18,9 @@ import java.util.List;
 
 @Service
 public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteService {
+
+    @Autowired
+    BirthdayInvitationsRepository birthdayInvitationsRepository;
 
     private final Calendar service;
 
@@ -29,20 +30,21 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
     }
 
     @Override
-    public String sendBirthdayInviteAndGetLink(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception {
+    public String sendBirthdayInviteAndGetEventId(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours,
+                                                  Integer durationMinutes, String description) throws Exception {
         Event event = new Event()
                 .setSummary("RD " + childName)
 
                 .setLocation(location)
-                .setDescription("Vabilo " + childName);
+                .setDescription(description);
 
-        DateTime startDateTime = new DateTime(eventDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        DateTime startDateTime = new DateTime(eventDateTime.minusMinutes(15).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()); // minus 15 minut zarad animatorja
         EventDateTime start = new EventDateTime()
                 .setDateTime(startDateTime)
                 .setTimeZone(ZoneId.systemDefault().toString());
         event.setStart(start);
 
-        DateTime endDateTime = new DateTime(eventDateTime.plusHours(durationHours).plusMinutes(durationMinutes).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        DateTime endDateTime = new DateTime(eventDateTime.plusHours(durationHours).plusMinutes(durationMinutes).plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         EventDateTime end = new EventDateTime()
                 .setDateTime(endDateTime)
                 .setTimeZone(ZoneId.systemDefault().toString());
@@ -56,7 +58,19 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
         String calendarId = "primary";
         event = service.events().insert(calendarId, event).setSendNotifications(true).execute();
         System.out.printf("Event created: %s\n", event.getHtmlLink());
-        return event.getHtmlLink();
+
+       return event.getId();
+        //return event.getHtmlLink();
+    }
+
+    @Override
+    public void getResponseAndSaveToDB(String eventId, String calendarId , Boolean extraAnimator, String animatorEmail) throws IOException {
+       HashMap<String, Integer> emailAndResponse =  checkGuestResponse(eventId,calendarId);
+       if(!extraAnimator){
+           birthdayInvitationsRepository.updateAnimatorInviteResponse(emailAndResponse.get(animatorEmail), eventId);
+       }else {
+           birthdayInvitationsRepository.updateExtraAnimatorInviteResponse(emailAndResponse.get(animatorEmail), eventId);
+       }
     }
 
     @Override
@@ -80,29 +94,17 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
         return emailAndResponse;
     }
 
+
     @Override
-    public String extractEventId(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String query = url.getQuery();
-            String[] pairs = query.split("&");
-            for (String pair : pairs) {
-                int idx = pair.indexOf("=");
-                if (idx > 0 && pair.substring(0, idx).equals("eid")) {
-                    return URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8.toString());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String emailToSendInvitationTo, Integer durationHoursAnimator
+            , Integer durationMinutesAnimator, Integer idLocation,String description, String parentEmail, Boolean extraAnimator) throws Exception {
+        String eventId = sendBirthdayInviteAndGetEventId(childName, eventDateTime, location, emailToSendInvitationTo, durationHoursAnimator,durationMinutesAnimator,description);
+
+        if(extraAnimator){
+            birthdayInvitationsRepository.updateExtraAnimatorInviteSentToTrueAndAddEventId(parentEmail,eventDateTime,idLocation,childName,eventId);
+        }else {
+            birthdayInvitationsRepository.updateAnimatorInviteSentToTrueAndAddEventId(parentEmail,eventDateTime,idLocation,childName,eventId);
         }
-        return null;
-    }
-
-    @Override
-    public void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours, Integer durationMinutes) throws Exception {
-        String eventURL = sendBirthdayInviteAndGetLink(childName, eventDateTime, location, guestEmail, durationHours,durationMinutes);
-        String eventId = extractEventId(eventURL);
-
     }
 
     private Integer emailResponseToInt(String response) {
@@ -114,5 +116,6 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
             default -> 2;
         };
     }
+
 }
 
