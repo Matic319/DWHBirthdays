@@ -60,6 +60,7 @@ public class MailSendingServiceImpl implements MailSendingService {
     @Autowired
     ThymeleafConfiguration thymeleafConfiguration;
 
+
     //private final TemplateEngine templateEngine;
 
     DateTimeFormatter formatterDB = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
@@ -74,26 +75,35 @@ public class MailSendingServiceImpl implements MailSendingService {
         List<Object[]> listOfClientsToSend = birthdayInvitationsRepository.getAllClientsThatHaveNotReceivedTheInvitation(idLocation);
 
         for (Object[] row : listOfClientsToSend) {
-            LocalDateTime dateTime = LocalDateTime.parse(row[0].toString(), formatterDB);
-            String date = dateTime.toLocalDate().format(formatterInviteDate);
-            String startTime = dateTime.toLocalTime().format(formatterInviteTime);
+            LocalDateTime dateFrom = LocalDateTime.parse(row[0].toString(), formatterDB);
+            String date = dateFrom.toLocalDate().format(formatterInviteDate);
+            String startTime = dateFrom.toLocalTime().format(formatterInviteTime);
             String childName = row[2].toString();
             String age = row[3].toString();
-            String phone = row[4].toString();
+            String phone = pdfTextInsertionService.convertPhoneNumber(row[4].toString());
             String food = row[18].toString();
             String desserts = row[19].toString();
             String minAge = row[20].toString();
             String maxAge = row[21].toString();
             String participantCount = row[22].toString();
+            String comments = row[23].toString();
             String partyType = row[26].toString();
             String parentFirstName = row[27].toString();
             String parentLastName = row[28].toString();
+            LocalDateTime dateTo = LocalDateTime.parse(row[29].toString(),formatterDB);
+            String endTime = dateTo.toLocalTime().format(formatterInviteTime);
+
+            String locationNameAndAddress = pdfTextInsertionService.locationName(idLocation) + ", " + pdfTextInsertionService.locationAddress(idLocation);
+
 
             try {
                 byte[] jpgData = pdfTextInsertionService.createAndConvertPdfToJpg(age, date, startTime, phone, childName, idLocation);
-                Context context = getContext(date, startTime)
-                sendEmail("matic.zigon@woop.fun", childName, jpgData,idLocation);
-                birthdayInvitationsRepository.updateEmailSent(idLocation,dateTime,"matic.zigon@woop.fun",childName);
+                Context context = getContext(date, startTime,partyType,participantCount,age,
+                        parentFirstName + " " + parentLastName,
+                        phone, locationNameAndAddress, endTime,food,desserts,comments,
+                        minAge, maxAge);
+                sendEmail("matic.zigon@woop.fun", childName, jpgData,idLocation,context);
+                birthdayInvitationsRepository.updateEmailSent(idLocation,dateFrom,"matic.zigon@woop.fun",childName);
 
 
             } catch (Exception e) {
@@ -111,7 +121,7 @@ public class MailSendingServiceImpl implements MailSendingService {
 
         helper.setTo(toEmail);
         helper.setSubject("Vabilo za " + childName);
-        helper.setText("vabilo");
+        helper.setText(thymleafString,true);
 
         helper.addAttachment("vabilo_" + childName +".jpg", new ByteArrayDataSource(attachment, "image/jpeg"));
 
@@ -124,8 +134,8 @@ public class MailSendingServiceImpl implements MailSendingService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
 
-        Context context = getContext();
-
+        Context context = new Context();
+        context.setVariable("dateFrom", "12.1.2024");
 
         String thymleafString = thymeleafConfiguration.templateEngine().process("mail_template",context);
 
@@ -137,14 +147,15 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
     private  Context getContext(String dateFrom, String startTime, String partyType,
-                                String price, String participantCount, Integer age, String parentFullName, String phone,
-                                String location, LocalTime endTime, String food, String desserts, String comments  ) {
+                                String participantCount, String age, String parentFullName, String phone,
+                                String location, String endTime, String food, String desserts, String comments,
+                                String minAge, String maxAge) {
         Context context = new Context();
 
         context.setVariable("dateFrom", dateFrom);
         context.setVariable("startTime", startTime);
         context.setVariable("partyType",partyType);
-        context.setVariable("price",price);
+        context.setVariable("price",setPriceForPartyType(partyType));
         context.setVariable("participantCount", participantCount);
         context.setVariable("age", age);
         context.setVariable("parentFullName",parentFullName);
@@ -154,6 +165,8 @@ public class MailSendingServiceImpl implements MailSendingService {
         context.setVariable("food",food);
         context.setVariable("desserts",desserts);
         context.setVariable("comments",comments);
+        context.setVariable("minAge", minAge);
+        context.setVariable("maxAge", maxAge);
         return context;
     }
 
@@ -169,6 +182,14 @@ public class MailSendingServiceImpl implements MailSendingService {
             case 100 -> mailSender = mailSenderMatic;
         }
         return mailSender;
+    }
+
+    private String setPriceForPartyType(String partyType) {
+        return switch(partyType){
+            case "Super fun zabava" -> "15.50€";
+            case "Skakalna zabava", "Plezalna zabava" -> "17.50€";
+            default -> "€";
+        };
     }
 
 

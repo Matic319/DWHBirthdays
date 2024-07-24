@@ -7,9 +7,11 @@ import java.io.IOException;
 @Service
 public interface PDFTextInsertionService {
 
-     void insertTextIntoPdf( String outputFilePath, String age,
-                                  String dateFrom, String time,
-                                  String phone, String childName, Integer idLocation) throws IOException;
+    String locationAddress(Integer idLocation);
+
+    void insertTextIntoPdf(String outputFilePath, String age,
+                           String dateFrom, String time,
+                           String phone, String childName, Integer idLocation) throws IOException;
 
      void convertPdfToJpgAndSave(String inputFilePath, String outputFilePrefix, int dpi) throws IOException;
 
@@ -18,4 +20,6 @@ public interface PDFTextInsertionService {
      String convertPhoneNumber(String phone);
 
       byte[] createAndConvertPdfToJpg(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException;
+
+    String locationName(Integer idLocation);
 }

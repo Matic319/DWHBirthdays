@@ -24,8 +24,8 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
     private static final float POINTS_PER_INCH = 72f;
 
-
-    private String locationName(Integer idLocation){
+@Override
+    public String locationName(Integer idLocation){
         return switch(idLocation) {
             case 1 -> "WOOP! Fun park";
             case 2 -> "WOOP! Karting & Glow golf";
@@ -35,8 +35,8 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             default -> throw new IllegalStateException("wrong idLocation: " + idLocation);
         };
     }
-
-    private String locationAddress(Integer idLocation){
+@Override
+    public String locationAddress(Integer idLocation){
         return switch(idLocation) {
             case 1 -> "Leskoškova cesta 3";
             case 2, 3 -> "Moskovska ulica 10";
