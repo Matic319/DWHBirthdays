@@ -47,15 +47,27 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                 Boolean sendInvitation = Boolean.valueOf(row.get(18).toString());
                 Boolean sendInviteToAnimator = Boolean.valueOf(row.get(14).toString());
 
-                System.out.println("date" + date + " sendInvite " + sendInvitation + " sendInviteAnimaotr: " + sendInviteToAnimator);
-
                 if (sendInvitation || sendInviteToAnimator) {
-                    String emailParent = row.get(25) != null ? row.get(25).toString().trim() : "null";
-                    String emailAnimator = row.get(11) != null ? row.get(11).toString().trim() : null;
-                    String emailExtraAnimator = row.get(13) != null ? row.get(13).toString().trim() : null;
+                    String emailParent = row.get(25) != null ? row.get(25).toString() : null;
+                    if(emailParent != null){
+                        if(!emailParent.contains("@")){
+                            emailParent = null; // zapis v error log
+                        }
+                    }
+                    String emailAnimator = row.get(11) != null  ? row.get(11).toString() : null;
+                    if(emailAnimator != null){
+                        if(!emailAnimator.contains("@")){
+                            emailAnimator = null; // zapis v error log
+                        }
+                    }
+                    String emailExtraAnimator = row.get(13) != null ? row.get(13).toString() : null;
+                    if(emailExtraAnimator != null){
+                        if(!emailExtraAnimator.contains("@")){
+                            emailExtraAnimator = null; // zapiš
+                        }
+                    }
 
-
-                    if (emailParent.contains("@")) {
+                    if (emailParent != null) {
                         LocalTime startTime;
                         LocalTime endTime;
                         try {
@@ -73,26 +85,58 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                         }
 
                         String childName = row.get(19).toString();
-                        Integer age = Integer.parseInt(row.get(22).toString());
+
+                        Integer age;
+                        try{
+                            age = Integer.parseInt(row.get(22).toString());
+                        }catch (NumberFormatException e){
+                            age = 0;
+                        }
+
                         String phone = row.get(26).toString();
                         LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
                         String partyPlaceName = row.get(9).toString() != null ? row.get(9).toString() : null;
                         Integer durationHours = getDurationHours(startTime, endTime);
                         Integer durationMinutes = getDurationMinutes(startTime, endTime);
-                        Integer minAge = Integer.parseInt(row.get(23).toString());
-                        Integer maxAge = Integer.parseInt(row.get(24).toString());
-                        Integer participantCount = Integer.parseInt(row.get(21).toString());
+                        Integer minAge;
+                        try {
+                            minAge = Integer.parseInt(row.get(23).toString()); // mogoče pišejo s pomišljaji leta ?
+                        }catch (NumberFormatException e) {
+                            minAge = 0;
+                        }
+                        Integer maxAge;
+                        try {
+                            maxAge = Integer.parseInt(row.get(24).toString());
+                        }catch (NumberFormatException e) {
+                            maxAge = 0;
+                        }
+                        Integer participantCount;
+                        try {
+                            participantCount = Integer.parseInt(row.get(21).toString());
+                        }catch (NumberFormatException e) {
+                            participantCount = 0;
+                        }
+                        LocalDateTime dateTo = LocalDateTime.of(date,endTime);
                         String desserts = row.get(29).toString() != null ? row.get(29).toString() : null;
                         String food = row.get(30).toString() != null ? row.get(30).toString() : null;
                         String comments = row.get(8).toString() != null ? row.get(8).toString() : null;
                         String duration = row.get(7).toString() != null ? row.get(7).toString() : null;
                         String partyType = row.get(6).toString() != null ? row.get(6).toString() : null;
                         String attractionComments = row.get(4).toString() != null ? row.get(4).toString() : null;
-                        String description = setDescription(childName,startTime,endTime,partyPlaceName,partyType,duration,desserts,food,age,minAge,maxAge,participantCount,comments,attractionComments);
+                        String parentFirstName = row.get(27).toString() != null ? row.get(27).toString() : null;
+                        String parentLastName = row.get(28).toString() != null ? row.get(28).toString() : null;
+                        String description = setDescription(childName,
+                                startTime,endTime,partyPlaceName,partyType,
+                                duration,desserts,food,age,minAge,maxAge,participantCount,
+                                comments,attractionComments);
 
                         if (birthdayInvitationsRepository.findByEmailAndDateFromAndIdLocationAndChildName(emailParent, dateFrom, idLocation, childName).isEmpty()) {
-                            setBdayInvitationAndSave(idLocation, emailParent, dateFrom, childName, age, phone, emailAnimator, emailExtraAnimator, partyPlaceName,
-                                    minAge, maxAge, participantCount, desserts, food, comments, duration, partyType, attractionComments);
+                            setBdayInvitationAndSave(idLocation,
+                                    emailParent, dateFrom, childName, age, phone,
+                                    emailAnimator, emailExtraAnimator, partyPlaceName,
+                                    minAge, maxAge, participantCount, desserts, food,
+                                    comments, duration, partyType, attractionComments,
+                                    parentFirstName,parentLastName,dateTo);
                             if (sendInviteToAnimator) {
                                 try {
                                     googleCalendarInviteService.birthdayInviteToCalendarAndDB(childName, dateFrom, partyPlaceName, emailAnimator,
@@ -104,10 +148,8 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                 } catch (Exception e) {
                                     System.out.println("couldn't send" + e.getMessage());
                                 }
-
                             }
                         } else {
-
                             if (emailAnimator != null &&
                                     birthdayInvitationsRepository.findByEmailAndDateFromAndChildNameAndIdLocationAndAnimatorEmail(
                                             emailParent, dateFrom, childName, idLocation, emailAnimator).isEmpty()) {
@@ -128,7 +170,7 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                         googleCalendarInviteService.birthdayInviteToCalendarAndDB(childName, dateFrom, partyPlaceName, emailAnimator,
                                                 durationHours, durationMinutes, idLocation,description, emailParent,false);
                                     } catch (Exception e) {
-                                        throw new RuntimeException(e);
+                                        System.out.println("error birthdayInviteToCalendarAndDB : " + e.getMessage() );
                                     }
                                 }else {
                                     String inviteId = birthdayInvitationsRepository.getInviteIdWhereThereIsNoResponse(emailAnimator,idLocation,dateFrom);
@@ -136,7 +178,7 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                             try {
                                                 googleCalendarInviteService.getResponseAndSaveToDB(inviteId,"matic.zigon@woop.fun",false,emailAnimator); // uved spremenljivko za calendarID !!!!!
                                             } catch (IOException e) {
-                                                throw new RuntimeException(e);
+                                                System.out.println("error gerResponseAndSaveToDB:" + e.getMessage());
                                             }
                                         }
                                 }
@@ -161,14 +203,14 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                     googleCalendarInviteService.birthdayInviteToCalendarAndDB(childName, dateFrom, partyPlaceName,
                                             emailExtraAnimator, durationHours, durationMinutes, idLocation,description,emailParent,true);
                                 } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                    System.out.println("error birthdayINviteTocalendarAndDB : " + e.getMessage() );
                                 }
                             } else if (emailExtraAnimator != null && checkIfInviteWasAlreadySent(emailParent, dateFrom, childName, true, idLocation)){
                                 String inviteId = birthdayInvitationsRepository.getInviteIdWhereThereIsNoResponse(emailAnimator,idLocation,dateFrom);
                                 try {
                                     googleCalendarInviteService.getResponseAndSaveToDB(inviteId,"matic.zigon@woop.fun",true,emailExtraAnimator);
                                 } catch (IOException e) {
-                                    throw new RuntimeException(e);
+                                    System.out.println("error gerReSponseAndSAveToDB:" + e.getMessage());
                                 }
                             }
                         }
@@ -183,7 +225,8 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                           Integer age, String phone, String animatorEmail, String extraAnimatorEmail,
                                           String partyPlaceName, Integer minAge, Integer maxAge, Integer participantCount,
                                           String desserts, String food, String comments, String duration, String partyType,
-                                          String attractionComments) {
+                                          String attractionComments, String parentFirstName, String parentLastName,
+                                          LocalDateTime dateTo) {
         BirthdayInvitations bdInv = new BirthdayInvitations();
         bdInv.setEmail(email);
         bdInv.setDateFrom(dateFrom);
@@ -207,6 +250,9 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
         bdInv.setDuration(duration);
         bdInv.setPartyType(partyType);
         bdInv.setAttractionComments(attractionComments);
+        bdInv.setParentFirstName(parentFirstName);
+        bdInv.setParentLastName(parentLastName);
+        bdInv.setDateTo(dateTo);
         birthdayInvitationsRepository.save(bdInv);
     }
 

@@ -97,4 +97,13 @@ public class BirthdayInvitations {
     @Column(name = "partyType")
     private String partyType;
 
+    @Column(name = "parentFirstName")
+    private String parentFirstName;
+
+    @Column(name = "parentLastName")
+    private String parentLastName;
+
+    @Column(name = "dateTo")
+    private LocalDateTime dateTo;
+
 }

@@ -31,7 +31,7 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
 
     @Override
     public String sendBirthdayInviteAndGetEventId(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHours,
-                                                  Integer durationMinutes, String description) throws Exception {
+                                                  Integer durationMinutes, String description, Integer idLocationForCalendarId) throws Exception {
         Event event = new Event()
                 .setSummary("RD " + childName)
 
@@ -55,7 +55,7 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
         };
         event.setAttendees(List.of(attendees));
 
-        String calendarId = "primary";
+        String calendarId = getCalendarId(idLocationForCalendarId);
         event = service.events().insert(calendarId, event).setSendNotifications(true).execute();
         System.out.printf("Event created: %s\n", event.getHtmlLink());
 
@@ -98,7 +98,8 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
     @Override
     public void birthdayInviteToCalendarAndDB(String childName, LocalDateTime eventDateTime, String location, String emailToSendInvitationTo, Integer durationHoursAnimator
             , Integer durationMinutesAnimator, Integer idLocation,String description, String parentEmail, Boolean extraAnimator) throws Exception {
-        String eventId = sendBirthdayInviteAndGetEventId(childName, eventDateTime, location, emailToSendInvitationTo, durationHoursAnimator,durationMinutesAnimator,description);
+        String eventId = sendBirthdayInviteAndGetEventId(childName, eventDateTime, location, emailToSendInvitationTo, durationHoursAnimator,
+                durationMinutesAnimator,description, idLocation);
 
         if(extraAnimator){
             birthdayInvitationsRepository.updateExtraAnimatorInviteSentToTrueAndAddEventId(parentEmail,eventDateTime,idLocation,childName,eventId);
@@ -114,6 +115,17 @@ public class GoogleCalendarInviteServiceImpl implements GoogleCalendarInviteServ
             case "needsAction" ->-1;
 
             default -> 2;
+        };
+    }
+
+    private String getCalendarId(Integer idLocation) {
+        return switch(idLocation) {
+            case 2 -> "infokarting@woop.fun";
+            case 3 -> "infoarena@woop.fun";
+            case 5 -> "inforudnik@woop.fun";
+            case 6 -> "infomb@woop.fun";
+            case 100 -> "matic.zigon@woop.fun";
+            default -> "info@woop.fun";
         };
     }
 

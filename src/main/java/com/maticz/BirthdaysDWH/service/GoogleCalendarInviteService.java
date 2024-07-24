@@ -18,7 +18,7 @@ public interface GoogleCalendarInviteService {
                                        Integer idLocation, String description, String parentEmail, Boolean extraAnimator) throws Exception;
 
     String sendBirthdayInviteAndGetEventId(String childName, LocalDateTime eventDateTime, String location, String guestEmail, Integer durationHoursAnimator,
-                                           Integer durationMinutesAnimator, String description) throws Exception;
+                                           Integer durationMinutesAnimator, String description, Integer idLocationForCalendarId) throws Exception;
 
     void getResponseAndSaveToDB(String eventId, String calendarId, Boolean extraAnimator, String animatorEmail) throws IOException;
 }

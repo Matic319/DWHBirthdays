@@ -38,7 +38,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
     private String locationAddress(Integer idLocation){
         return switch(idLocation) {
-            case 1 -> "Leskoškova cesta 2";
+            case 1 -> "Leskoškova cesta 3";
             case 2, 3 -> "Moskovska ulica 10";
             case 5 -> "rudnik";
             case 6 -> "MB";

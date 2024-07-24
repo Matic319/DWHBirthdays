@@ -1,7 +1,7 @@
 package com.maticz.BirthdaysDWH.controller;
 
-import com.maticz.BirthdaysDWH.service.GoogleCalendarInviteService;
 import com.maticz.BirthdaysDWH.service.impl.*;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/pictures")
@@ -42,6 +40,7 @@ public class PicturesController {
 
     @Autowired
     GoogleCalendarInviteServiceImpl googleCalendarInviteService;
+
 
     @Scheduled(cron = "0 30 */2 * * *")
     @GetMapping("/TP")
@@ -89,9 +88,10 @@ public class PicturesController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<String> test() throws IOException {
+    public ResponseEntity<String> test() throws Exception {
 
-        mailSendingService.sendBirthdayInvitationsEmail(1);
+        googleCalendarInviteService.sendBirthdayInviteAndGetEventId("test", LocalDateTime.of(2024,7,22,14,0,0),
+                "Rumena soba","matic.zigon@woop.fun",1,10,"test opis",100 );
 
         return ResponseEntity.ok("ok");
     }
@@ -122,4 +122,12 @@ public class PicturesController {
         birthdayInvitationsService.mapAndSaveToInvitations("1yOuM05L6YPadJ8cZ8WDghtdZZLaDAXvXlJOlUqG9zrI","Test",7);
         return ResponseEntity.ok("ok");
     }
+
+
+    @GetMapping("/mailTemplateTest")
+    public ResponseEntity<String> mailTemplateTest() throws IOException, MessagingException {
+        mailSendingService.sendTestEmail("matic.zigon@woop.fun",100);
+        return ResponseEntity.ok("ok");
+    }
+
 }
