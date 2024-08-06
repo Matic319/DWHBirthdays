@@ -9,9 +9,9 @@ public interface PDFTextInsertionService {
 
     String locationAddress(Integer idLocation);
 
-    void insertTextIntoPdf(String outputFilePath, String age,
-                           String dateFrom, String time,
-                           String phone, String childName, Integer idLocation) throws IOException;
+    void insertTextIntoPdfInvite(String outputFilePath, String age,
+                                 String dateFrom, String time,
+                                 String phone, String childName, Integer idLocation) throws IOException;
 
      void convertPdfToJpgAndSave(String inputFilePath, String outputFilePrefix, int dpi) throws IOException;
 
@@ -22,4 +22,9 @@ public interface PDFTextInsertionService {
       byte[] createAndConvertPdfToJpg(String age, String dateFrom, String time, String phone, String childName, Integer idLocation) throws IOException;
 
     String locationName(Integer idLocation);
+
+
+
+    void insertTextIntoPdfFormForBDay(String outputFilePath, String date, String time, String partyType, String childName,
+                                      String childSurname, String participantCount, String age, String phone) throws IOException;
 }

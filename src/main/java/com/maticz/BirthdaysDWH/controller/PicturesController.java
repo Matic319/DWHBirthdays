@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @RestController
@@ -124,10 +125,14 @@ public class PicturesController {
     }
 
 
-    @GetMapping("/mailTemplateTest")
-    public ResponseEntity<String> mailTemplateTest() throws IOException, MessagingException {
-        mailSendingService.sendBirthdayInvitationsEmail(100);
-        return ResponseEntity.ok("ok");
-    }
+@GetMapping("/formTest")
+public ResponseEntity<String> formTest() throws IOException {
+
+        pdfTextInsertionService.insertTextIntoPdfFormForBDay("C:\\Users\\Matic\\Desktop\\test.pdf", "6.8.", "17:30", "Super jump",
+                "Imeotroka", "Priimek", "10", "7", "031123456");
+
+    return ResponseEntity.ok("ok");
+}
+
 
 }
