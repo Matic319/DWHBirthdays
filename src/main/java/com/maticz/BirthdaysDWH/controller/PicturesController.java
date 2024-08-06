@@ -126,7 +126,7 @@ public class PicturesController {
 
     @GetMapping("/mailTemplateTest")
     public ResponseEntity<String> mailTemplateTest() throws IOException, MessagingException {
-        mailSendingService.sendTestEmail("matic.zigon@woop.fun",100);
+        mailSendingService.sendBirthdayInvitationsEmail(100);
         return ResponseEntity.ok("ok");
     }
 

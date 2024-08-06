@@ -121,7 +121,7 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                         String food = row.get(30).toString() != null ? row.get(30).toString() : null;
                         String comments = row.get(8).toString() != null ? row.get(8).toString() : null;
                         String duration = row.get(7).toString() != null ? row.get(7).toString() : null;
-                        String partyType = row.get(6).toString() != null ? row.get(6).toString() : null;
+                        String partyType = row.get(5).toString() != null ? row.get(6).toString() : null;
                         String attractionComments = row.get(4).toString() != null ? row.get(4).toString() : null;
                         String parentFirstName = row.get(27).toString() != null ? row.get(27).toString() : null;
                         String parentLastName = row.get(28).toString() != null ? row.get(28).toString() : null;

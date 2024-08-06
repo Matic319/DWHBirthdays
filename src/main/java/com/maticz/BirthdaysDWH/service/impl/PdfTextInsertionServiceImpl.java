@@ -32,6 +32,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             case 3 -> "WOOP! Arena";
             case 5 -> "WOOP! Izzivi";
             case 6 -> "WOOP! Maribor";
+            case 100 -> "WOOP! Test";
             default -> throw new IllegalStateException("wrong idLocation: " + idLocation);
         };
     }
@@ -42,6 +43,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             case 2, 3 -> "Moskovska ulica 10";
             case 5 -> "rudnik";
             case 6 -> "MB";
+            case 100 -> "Testni naslov 5";
             default -> throw new IllegalStateException("wrong idLocation: " + idLocation);
         };
     }

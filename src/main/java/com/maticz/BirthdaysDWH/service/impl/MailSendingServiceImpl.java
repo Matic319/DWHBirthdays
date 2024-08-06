@@ -17,10 +17,12 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -164,7 +166,7 @@ public class MailSendingServiceImpl implements MailSendingService {
         context.setVariable("endTime", endTime);
         context.setVariable("food",food);
         context.setVariable("desserts",desserts);
-        context.setVariable("comments",comments);
+        context.setVariable("comments", comments);
         context.setVariable("minAge", minAge);
         context.setVariable("maxAge", maxAge);
         return context;
@@ -185,10 +187,16 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
     private String setPriceForPartyType(String partyType) {
+
+
         return switch(partyType){
-            case "Super fun zabava" -> "15.50€";
-            case "Skakalna zabava", "Plezalna zabava" -> "17.50€";
-            default -> "€";
+            case "Super fun zabava" -> "27.50";
+            case "Skakalna zabava", "Plezalna zabava" -> "21.50";
+            case "Mega fun zabava" -> "31.50";
+            case "Lov na zaklad TEMATSKI" -> "1";
+            case "Lov na zaklad ČRKE" -> "2";
+            case "Lov na zaklad SIMBOLI" -> "32";
+            default -> "5";
         };
     }
 
