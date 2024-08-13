@@ -134,10 +134,5 @@ public ResponseEntity<String> formTest() throws IOException {
     return ResponseEntity.ok("ok");
 }
 
-@GetMapping("/sendForm")
-    public ResponseEntity<String> sendForm() throws MessagingException, IOException {
-    mailSendingService.sendBDayForm(1);
-    return ResponseEntity.ok("ok");
-}
 
 }

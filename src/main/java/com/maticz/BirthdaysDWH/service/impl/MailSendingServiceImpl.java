@@ -116,14 +116,14 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
     @Override
-    public void sendBDayForm(Integer idLocation) throws MessagingException, IOException {
+    public void sendBDayForm(Integer idLocation, String sendTo) throws MessagingException, IOException {
         List<Object[]> getFormDataList = birthdaysRepository.getBdayFormData(idLocation);
 
 
         MimeMessage message = mailSenderMatic.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message,true);
 
-        helper.setTo("matic.zigon@woop.fun");
+        helper.setTo(sendTo);
         helper.setSubject("RD obrazci");
         helper.setText("lp");
 

@@ -50,7 +50,7 @@ public interface BirthdaysRepository extends JpaRepository<Birthdays,Long> {
                     "   participantCount   \n" +
                     "    from DWH_Fact_Birthdays a\n" +
                     " where upcoming = 1 and idLocation = :idLocation \n" +
-                    "                    and cast(dateFrom as date) = cast(GETDATE() as date) ", nativeQuery = true)
+                    "                    and cast(dateFrom as date) = cast(dateadd(day,1,GETDATE()) as date) ", nativeQuery = true)
     List<Object[]> getBdayFormData(@Param("idLocation") Integer idLocation);
 
 }
