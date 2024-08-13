@@ -129,10 +129,15 @@ public class PicturesController {
 public ResponseEntity<String> formTest() throws IOException {
 
         pdfTextInsertionService.insertTextIntoPdfFormForBDay("C:\\Users\\Matic\\Desktop\\test.pdf", "6.8.", "17:30", "Super jump",
-                "Imeotroka", "Priimek", "10", "7", "031123456");
+                "Imeotroka", "Priimek", "10", "7", "031123456", "partySoba");
 
     return ResponseEntity.ok("ok");
 }
 
+@GetMapping("/sendForm")
+    public ResponseEntity<String> sendForm() throws MessagingException, IOException {
+    mailSendingService.sendBDayForm(1);
+    return ResponseEntity.ok("ok");
+}
 
 }

@@ -283,7 +283,7 @@ public class BirthdayController {
 
     @GetMapping("/upcoming")
     @Scheduled(cron = "0 51 2 * * *")
-    public ResponseEntity<String> upcomingTP() throws IOException {
+    public ResponseEntity<String> upcomingBDays() throws IOException {
         birthdayServiceImpl.mapAndSaveUpcomingBirthdays("1mbEZtS329eu7miy42dWSIvECvjHeNosIOALv-S236a8","Trampolin park",1);
         birthdayServiceImpl.mapAndSaveUpcomingBirthdays("1dRx3K0y_ANJl7nFlLeVgKg2CIg7EoMufMMn16S6giTE", "Karting",2);
         birthdayServiceImpl.mapAndSaveUpcomingBirthdays("1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY","Arena",3);

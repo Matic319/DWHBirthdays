@@ -26,5 +26,8 @@ public interface PDFTextInsertionService {
 
 
     void insertTextIntoPdfFormForBDay(String outputFilePath, String date, String time, String partyType, String childName,
-                                      String childSurname, String participantCount, String age, String phone) throws IOException;
+                                      String childSurname, String participantCount, String age, String phone, String partyPlace) throws IOException;
+
+    byte[] createPdfInMemoryBDayForm(String date, String time, String partyType, String childName, String childSurname,
+                                     String participantCount, String age, String phone, String partyPlace) throws IOException;
 }

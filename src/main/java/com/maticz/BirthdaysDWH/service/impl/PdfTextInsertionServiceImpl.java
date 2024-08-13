@@ -206,7 +206,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
         @Override
         public void insertTextIntoPdfFormForBDay(String outputFilePath, String date, String time, String partyType, String childName,
-                                                 String childSurname, String participantCount, String age, String phone) throws IOException {
+                                                 String childSurname, String participantCount, String age, String phone, String partyPlace) throws IOException {
             try (InputStream inputStream = getClass().getResourceAsStream("/obrazec.pdf")) {
                 PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
 
@@ -217,21 +217,52 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
                 try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                    // contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                    insertText(contentStream, date, 1.6f, 2.75f, pageHeightInPoints, 18);
-                    insertText(contentStream, time, 2.0f, 3.15f, pageHeightInPoints, 18);
-                    insertText(contentStream, partyType, 2.4f, 3.5f, pageHeightInPoints, 18);
-                    insertText(contentStream, childName, 2.2f, 4.25f, pageHeightInPoints, 18);
-                    insertText(contentStream, childSurname, 2.5f, 4.6f, pageHeightInPoints, 18);
-                    insertText(contentStream, convertPhoneNumber(phone), 2.1f, 4.95f, pageHeightInPoints, 18);
-                    insertText(contentStream, participantCount, 1.75f, 5.7f, pageHeightInPoints, 18);
-                    insertText(contentStream, age, 1.75f, 6.05f, pageHeightInPoints, 18);
+                    insertTextIntoBDayForm(date, time, partyType, childName, childSurname, participantCount, age, phone, partyPlace, contentStream, pageHeightInPoints);
                 }
 
                 document.save(outputFilePath);
                 document.close();
             }
         }
+
+
+    @Override
+    public byte[] createPdfInMemoryBDayForm(String date, String time, String partyType, String childName, String childSurname,
+                                            String participantCount, String age, String phone, String partyPlace) throws IOException {
+        try (InputStream inputStream = getClass().getResourceAsStream("/obrazec.pdf");
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
+            PDPage page = document.getPage(0);
+            PDRectangle pageSize = page.getMediaBox();
+            float pageHeightInPoints = pageSize.getHeight();
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+
+                insertTextIntoBDayForm(date,time,partyType,childName,childSurname,participantCount,age,phone,partyPlace,contentStream,pageHeightInPoints);
+            }
+
+            document.save(outputStream);
+            document.close();
+
+            return outputStream.toByteArray();
+        }
     }
+
+    private void insertTextIntoBDayForm(String date, String time, String partyType, String childName, String childSurname,
+                                        String participantCount, String age, String phone, String partyPlace,
+                                        PDPageContentStream contentStream, float pageHeightInPoints) throws IOException {
+        insertText(contentStream, date, 1.65f, 2.62f, pageHeightInPoints, 18);
+        insertText(contentStream, time, 2.0f, 3.0f, pageHeightInPoints, 18);
+        insertText(contentStream, partyType, 2.4f, 3.35f, pageHeightInPoints, 18);
+        insertText(contentStream, partyPlace, 1.95f, 3.7f, pageHeightInPoints, 18);
+        insertText(contentStream, childName, 2.2f, 4.45f, pageHeightInPoints, 18);
+        insertText(contentStream, childSurname, 2.5f, 4.85f, pageHeightInPoints, 18);
+        insertText(contentStream, phone, 2.1f, 5.2f, pageHeightInPoints, 18);
+        insertText(contentStream, participantCount, 1.75f, 5.9f, pageHeightInPoints, 18);
+        insertText(contentStream, age, 1.75f, 6.3f, pageHeightInPoints, 18);
+    }
+}
 
 
 

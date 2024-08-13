@@ -100,5 +100,15 @@ public class Birthdays {
     @Column(name = "upcoming")
     private Integer upcoming;
 
+    @Column(name = "durationTime")
+    private Integer durationTime;
 
+    @Column(name = "idExtraProgram")
+    private Integer idExtraProgram;
+
+    @Column(name ="idExtraProgramSubType")
+    private Integer idExtraProgramSubType;
+
+    @Column(name = "phone")
+    private String phone;
 }

@@ -106,4 +106,13 @@ public class BirthdayInvitations {
     @Column(name = "dateTo")
     private LocalDateTime dateTo;
 
+    @Column(name ="programType")
+    private String programType;
+
+    @Column(name ="extraProgramSubType")
+    private String extraProgramSubType;
+
+    @Column(name = "extraProgramType")
+    private String extraProgramType;
+
 }

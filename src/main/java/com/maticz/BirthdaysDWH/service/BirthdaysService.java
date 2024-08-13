@@ -35,6 +35,10 @@ public interface BirthdaysService {
 
     void mapAndSaveUpcomingBirthdays(String sheetId,String sheetName, Integer idLocation) throws IOException;
 
+    void mapSheetImportSaveToDBNEW(String sheetId, String sheetName, Integer idLocation) throws IOException;
+
+    void mapAndSaveUpcomingBirthdaysNEW(String sheetId, String sheetName, Integer idLocation) throws IOException;
+
     void getDatesAndTimeForBirthdays(String sheetId, String sheetName) throws IOException;
 
 }

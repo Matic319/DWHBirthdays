@@ -2,6 +2,7 @@ package com.maticz.BirthdaysDWH.service.impl;
 
 import com.maticz.BirthdaysDWH.config.ThymeleafConfiguration;
 import com.maticz.BirthdaysDWH.repository.BirthdayInvitationsRepository;
+import com.maticz.BirthdaysDWH.repository.BirthdaysRepository;
 import com.maticz.BirthdaysDWH.service.MailSendingService;
 import com.maticz.BirthdaysDWH.service.PDFTextInsertionService;
 import jakarta.mail.MessagingException;
@@ -9,20 +10,17 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.StandardReflectionParameterNameDiscoverer;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -61,6 +59,9 @@ public class MailSendingServiceImpl implements MailSendingService {
 
     @Autowired
     ThymeleafConfiguration thymeleafConfiguration;
+
+    @Autowired
+    BirthdaysRepository birthdaysRepository;
 
 
     //private final TemplateEngine templateEngine;
@@ -112,6 +113,39 @@ public class MailSendingServiceImpl implements MailSendingService {
                 System.err.println("Failed to send invitation to " + "clientEmail" + ": " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void sendBDayForm(Integer idLocation) throws MessagingException, IOException {
+        List<Object[]> getFormDataList = birthdaysRepository.getBdayFormData(idLocation);
+
+
+        MimeMessage message = mailSenderMatic.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+        helper.setTo("matic.zigon@woop.fun");
+        helper.setSubject("RD obrazci");
+        helper.setText("lp");
+
+
+        for (Object[] row : getFormDataList) {
+            LocalDateTime dateTime = LocalDateTime.parse(row[0].toString(),formatterDB);
+            String date = dateTime.format(formatterInviteDate);
+            String time = dateTime.format(formatterInviteTime);
+            String programName = row[1].toString();
+            String partyPlace = row[2].toString();
+            String childName = row[3].toString();
+            String childSurname = row[4].toString();
+            String age = row[5].toString();
+            String phone = row[6] != null ? row[6].toString() : "";
+            String participantCount = row[7].toString();
+
+            byte[] attachment = pdfTextInsertionService.createPdfInMemoryBDayForm(date,time,
+                    programName,childName,childSurname,participantCount,age,phone,partyPlace);
+
+            helper.addAttachment(childName + "_" + childSurname + ".pdf",new ByteArrayResource(attachment));
+        }
+        mailSenderMatic.send(message);
     }
 
     private void sendEmail(String toEmail, String childName, byte[] attachment, Integer idLocation, Context context) throws MessagingException {
