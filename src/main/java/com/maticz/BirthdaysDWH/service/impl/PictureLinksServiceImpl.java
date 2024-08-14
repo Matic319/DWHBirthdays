@@ -45,7 +45,7 @@ public class PictureLinksServiceImpl implements PictureLinksService {
     @Override
     public void mapSheetAndSaveToDB(String idSheet, String sheetName, Integer idLocation) throws IOException {
 
-        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(idSheet,sheetName,"B3:AM400");
+        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(idSheet,sheetName,"B3:AP400");
 
         for (List<Object> row : sheetData) {
 
@@ -64,9 +64,9 @@ public class PictureLinksServiceImpl implements PictureLinksService {
 
 
                 try {
-                    parentEmail = row.get(25).toString();
-                    pictureLink = row.get(37).toString();
-                    sendPhoto = Boolean.parseBoolean(row.get(16).toString());
+                    parentEmail = row.get(26).toString();
+                    pictureLink = row.get(39).toString();
+                    sendPhoto = Boolean.parseBoolean(row.get(17).toString());
                 } catch (Exception e) {
                     parentEmail = null;
                     pictureLink = null;
