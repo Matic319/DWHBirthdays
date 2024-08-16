@@ -76,6 +76,18 @@ public class PicturesController {
         pictureLinksService.writeToSheetBasedOnQuerry(2,sheetID);
         return ResponseEntity.ok("ok");
     }
+    @Scheduled(cron = "0 28 */2 * * *")
+    @GetMapping("/MB")
+    public ResponseEntity<String> getPicturesMB() throws IOException{
+
+        String sheetID = "1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY";
+        pictureLinksService.mapSheetAndSaveToDB(sheetID,"Maribor",6);
+        pictureLinksService.updatePictureLinkInAC(6);
+        pictureLinksService.updateEmailSentAndEmailOpened();
+        pictureLinksService.writeToSheetBasedOnQuerry(6,sheetID);
+        return ResponseEntity.ok("ok");
+    }
+
     @Scheduled(cron = "0 25 */2 * * *")
     @GetMapping("/Arena")
     public ResponseEntity<String> getPicturesArena() throws IOException{

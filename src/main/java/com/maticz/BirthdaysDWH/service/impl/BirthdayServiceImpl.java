@@ -819,215 +819,128 @@ public class BirthdayServiceImpl implements BirthdaysService {
 
     @Override
     public void mapSheetImportSaveToDB(String sheetId, String sheetName, Integer idLocation) throws IOException {
-
         List<List<Object>> sheet = googleSheetsService.readSheetRangeFrom(sheetId, sheetName, "A3:V90000");
 
         for (List<Object> row : sheet) {
-
             Boolean dontSave = false;
             Boolean error = false;
             ErrorLog errorToDB = new ErrorLog();
             errorToDB.setReadData(row.toString());
             errorToDB.setSheet(sheetName);
 
-            String errorField = null;
-            String errorMessage = null;
+            StringBuilder errorField = new StringBuilder();
+            StringBuilder errorMessage = new StringBuilder();
 
-            LocalDate date;
-            try {
-                date = LocalDate.parse(row.get(0).toString(), formatterDMYOnly);
+            String parentEmail = getStringValue(row, 16, "parentEmail", errorField, errorMessage);
 
-            } catch (DateTimeParseException e) {
-                date = LocalDate.of(1999, 1, 1);
-
-                errorField += "date ";
-                error = true;
-                errorMessage += e.getMessage();
-
-            }
-            LocalTime startTime;
-            try {
-                startTime = LocalTime.parse(row.get(1).toString(), formatterHMSOnly);
-
-            } catch (DateTimeParseException | IndexOutOfBoundsException e) {
-                try {
-                    startTime = LocalTime.parse(row.get(1).toString(), formatterHMOnly);
-                } catch (DateTimeParseException | IndexOutOfBoundsException f){
-                    startTime = LocalTime.of(0, 0, 0);
-                    errorField += "startTime ";
-                    errorMessage += f.getMessage();
-                    error = true;
-
-                }
-            }
-
-            LocalTime endTime;
-            try {
-                endTime = LocalTime.parse(row.get(2).toString(), formatterHMSOnly);
-            } catch (DateTimeParseException | IndexOutOfBoundsException e) {
-                try {
-                    endTime = LocalTime.parse(row.get(2).toString(), formatterHMOnly);
-                } catch (DateTimeParseException | IndexOutOfBoundsException f) {
-                    endTime = LocalTime.of(0, 0, 0);
-                    errorField += "endTime ";
-                    errorMessage += f.getMessage();
-                    error = true;
-                }
-
-            }
-
-            String birthdayProgType;
-            try {
-                birthdayProgType = row.get(3).toString();}
-            catch (IndexOutOfBoundsException e ) {
-                birthdayProgType = null;
-                errorField += "birthdayProgType ";
-                errorMessage += e.getMessage();
-                error = true;
-
-            }
-            String birthdayPartyType;
-            try {
-                birthdayPartyType = row.get(4).toString();}
-            catch (IndexOutOfBoundsException e) {
-                birthdayPartyType = null;
-                errorField += "birthdayPartyType ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
-
-            String duration;
-            String partyPlaceName;
-            String animator = null;
-            String extraAnimator = null ;
-            String childFirstName = null;
-            String childLastName = null;
-
-            try {
-                duration = row.get(5).toString();
-            } catch (IndexOutOfBoundsException e) {
-                duration = null;
-                errorField += "duration ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
-
-            try {
-                partyPlaceName = row.get(6).toString();
-            } catch (IndexOutOfBoundsException e) {
-                partyPlaceName = null;
-                errorField += "partyPlaceName ";
-                error = true;
-                errorMessage += e.getMessage();
-
-            }
-            try {
-                animator = row.get(7).toString();
-                extraAnimator = row.get(8).toString();
-                childFirstName = row.get(9).toString();
-                childLastName = row.get(10).toString();
-            }
-            catch (IndexOutOfBoundsException e ) {
+            if (parentEmail == null || parentEmail.isBlank()) {
                 dontSave = true;
-                errorField += "animator childFirstName childLastName ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
+            } else {
+                LocalDate date = getDateValue(row, 0, "date", errorField, errorMessage);
+                LocalTime startTime = getTimeValue(row, 1, "startTime", errorField, errorMessage);
+                LocalTime endTime = getTimeValue(row, 2, "endTime", errorField, errorMessage);
 
-            Integer participantCount;
-            try {
-                participantCount = Integer.parseInt(row.get(11).toString());
-            } catch (NumberFormatException | IndexOutOfBoundsException e ) {
-                participantCount = 0;
-                errorField += "participantCount ";
-                error = true;
-                errorMessage += e.getMessage();
+                String birthdayProgType = getStringValue(row, 3, "birthdayProgType", errorField, errorMessage);
+                String birthdayPartyType = getStringValue(row, 4, "birthdayPartyType", errorField, errorMessage);
+                String extraProgram = getStringValue(row, 5, "extraProgram", errorField, errorMessage);
+                String extraProgramSubType = getStringValue(row, 6, "extraProgramSubType", errorField, errorMessage);
+                String partyPlaceName = getStringValue(row, 7, "partyPlaceName", errorField, errorMessage);
 
-            }
-            Integer childBDayAge;
-            if (row.size() > 13) {
-                try {
-                    childBDayAge = Integer.parseInt(row.get(13).toString());
-                } catch (NumberFormatException e) {
-                    childBDayAge = 0;
-                    errorField += "childBdayAge ";
-                    error = true;
-                    errorMessage += e.getMessage();
+                String animator = getStringValue(row, 8, "animator", errorField, errorMessage);
+                String extraAnimator = getStringValue(row, 9, "extraAnimator", errorField, errorMessage);
+                String childFirstName = getStringValue(row, 10, "childFirstName", errorField, errorMessage);
+                String childLastName = getStringValue(row, 11, "childLastName", errorField, errorMessage);
+
+                Integer participantCount = getIntegerValue(row, 12, "participantCount", errorField, errorMessage);
+                Integer childBDayAge = getIntegerValue(row, 14, "childBDayAge", errorField, errorMessage);
+
+                String phone = getStringValue(row, 17, "phone", errorField, errorMessage);
+                String parentName = getStringValue(row, 18, "parentName", errorField, errorMessage);
+                String parentLastName = getStringValue(row, 19, "parentLastName", errorField, errorMessage);
+                String contactReservationType = getStringValue(row, 20, "contactReservationType", errorField, errorMessage);
+
+
+                Integer idExtraProgram = extraProgram != null ? getIdExtraProgram(extraProgram) : null;
+                Integer idExtraSubType = extraProgramSubType != null ? getIdExtraProgramSubType(extraProgramSubType) : null;
+                Integer idPlace = partyPlaceName != null ? getIdPlace(partyPlaceName) : null;
+                Integer idContactResType = contactReservationType != null ? getIdContactResType(contactReservationType) : null;
+                Integer idBDayProgType = birthdayProgType != null ? getIdBDayProgType(birthdayProgType) : null;
+                Integer idBirthdayPartyType = birthdayPartyType != null ? getIdBirthdayPartyType(birthdayPartyType) : null;
+
+
+
+                LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
+                LocalDateTime dateTo = LocalDateTime.of(date, endTime);
+
+                Birthdays birthday = setBirthdaysAndActive1NEW(idLocation, participantCount, parentEmail,
+                        idPlace, parentName, parentLastName, idContactResType, childFirstName, childLastName, birthdayPartyType, birthdayProgType, childBDayAge,
+                        dateFrom, dateTo, animator, extraAnimator, idBirthdayPartyType, partyPlaceName, idBDayProgType, idExtraProgram, idExtraSubType, phone);
+
+                if (errorField.length() > 0) {
+                    errorToDB.setDateFrom(dateFrom);
+                    errorToDB.setDateTo(dateTo);
+                    errorToDB.setParentEmail(parentEmail);
+                    errorToDB.setErrorField(errorField.toString());
+                    errorToDB.setErrorMessage(errorMessage.toString());
+                    // od komentiri za error log
+                    // errorLogRepository.save(errorToDB);
                 }
-            } else {
-                childBDayAge = 0;
-            }
 
-
-            String parentEmail;
-            String parentName;
-            String parentLastName;
-            String contactReservationType;
-            if (row.size() > 19) {
-                parentEmail = row.get(15).toString();
-                parentName = row.get(17).toString();
-                parentLastName = row.get(18).toString();
-                contactReservationType = row.get(19).toString();
-            } else {
-                parentEmail = "";
-                parentName = "";
-                parentLastName = "";
-                contactReservationType = "";
-                dontSave = true;
-            }
-            Integer idPlace = null;
-            Integer idContactResType = null;
-            Integer idBDayProgType = null;
-            Integer idBirthdayPartyType = null;
-
-            if (partyPlaceName != null && contactReservationType != null && birthdayPartyType != null && birthdayProgType != null ) {
-
-                idPlace = getIdPlace(partyPlaceName);
-                idContactResType = getIdContactResType(contactReservationType);
-                idBDayProgType = getIdBDayProgType(birthdayProgType);
-                idBirthdayPartyType = getIdBirthdayPartyType(birthdayPartyType);
-            }
-
-            LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
-            LocalDateTime dateTo = LocalDateTime.of(date, endTime);
-            Integer locationId = idLocation;
-
-
-
-                if (parentEmail == null || parentEmail.isBlank()) {
-                    dontSave = true;
-                } else {
-
-                    Birthdays birthday = setBirthdaysAndActive1(idLocation,participantCount,parentEmail,duration,
-                            idPlace,parentName,parentLastName,idContactResType,
-                            childFirstName,childLastName,birthdayPartyType,birthdayProgType,childBDayAge,
-                            dateFrom,dateTo,animator,extraAnimator,idBirthdayPartyType,partyPlaceName,idBDayProgType);
-
-
-                    /*if(birthdaysRepository.findByParentEmailAndDateFrom(parentEmail,dateFrom).isEmpty()) {
+                try {
+                    if (birthdaysRepository.findByParentEmailAndDateFromAndChildFirstNameAndIdLocation(parentEmail, dateFrom, childFirstName, idLocation).isEmpty()) {
                         birthdaysRepository.save(birthday);
-                    }*/
-                    if(error = true){
-                        errorToDB.setDateFrom(dateFrom);
-                        errorToDB.setDateTo(dateTo);
-                        errorToDB.setParentEmail(parentEmail);
-                        errorToDB.setErrorField(errorField);
-                        errorToDB.setErrorMessage(errorMessage);
-                        /*errorLogRepository.save(errorToDB);*/   //Od komentiri ce rabs errorLog
                     }
-                    try {
-                        if (birthdaysRepository.findByParentEmailAndDateFromAndChildFirstNameAndIdLocation(parentEmail, dateFrom, childFirstName, idLocation).isEmpty()) {
-                            birthdaysRepository.save(birthday);
-                        }
-                    }catch (Exception e) {
-                        logger.info("error" + e.getMessage());
-
-                    }
-                    }
-
+                } catch (Exception e) {
+                    logger.info("error" + e.getMessage());
+                }
             }
         }
+    }
 
+    // Helper methods for parsing values
+    private String getStringValue(List<Object> row, int index, String fieldName, StringBuilder errorField, StringBuilder errorMessage) {
+        try {
+            return row.get(index).toString();
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
+            errorField.append(fieldName).append(" ");
+            errorMessage.append(e.getMessage()).append("; ");
+            return null;
+        }
+    }
+
+    private Integer getIntegerValue(List<Object> row, int index, String fieldName, StringBuilder errorField, StringBuilder errorMessage) {
+        try {
+            return Integer.parseInt(row.get(index).toString());
+        } catch (IndexOutOfBoundsException | NullPointerException | NumberFormatException e) {
+            errorField.append(fieldName).append(" ");
+            errorMessage.append(e.getMessage()).append("; ");
+            return 0;
+        }
+    }
+
+    private LocalDate getDateValue(List<Object> row, int index, String fieldName, StringBuilder errorField, StringBuilder errorMessage) {
+        try {
+            return LocalDate.parse(row.get(index).toString(), formatterDMYOnly);
+        } catch (IndexOutOfBoundsException | NullPointerException | DateTimeParseException e) {
+            errorField.append(fieldName).append(" ");
+            errorMessage.append(e.getMessage()).append("; ");
+            return LocalDate.of(1999, 1, 1);
+        }
+    }
+
+    private LocalTime getTimeValue(List<Object> row, int index, String fieldName, StringBuilder errorField, StringBuilder errorMessage) {
+        try {
+            return LocalTime.parse(row.get(index).toString(), formatterHMSOnly);
+        } catch (IndexOutOfBoundsException | NullPointerException | DateTimeParseException e) {
+            try {
+                return LocalTime.parse(row.get(index).toString(), formatterHMOnly);
+            } catch (IndexOutOfBoundsException | NullPointerException | DateTimeParseException f) {
+                errorField.append(fieldName).append(" ");
+                errorMessage.append(f.getMessage()).append("; ");
+                return LocalTime.of(0, 0, 0);
+            }
+        }
+    }
 
 
     @Override
@@ -1239,7 +1152,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
     public void mapAndSaveUpcomingBirthdays(String sheetId, String sheetName, Integer idLocation) throws IOException {
         birthdaysRepository.deleteUpcomingBdays(idLocation);
         logger.info("idlocation: " + idLocation.toString());
-        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId,sheetName,"B3:AN12000");
+        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId,sheetName,"B3:AP12000");
                 for(List<Object> row : sheetData) {
                     try {
                         logger.info("rowData: " + row.toString());
@@ -1247,7 +1160,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
                         if (date.isAfter(LocalDate.now().minusDays(1))) {
                             String parentEmail;
                             try {
-                                parentEmail = row.get(25).toString();
+                                parentEmail = row.get(26).toString();
                                 logger.info("email: " + parentEmail);
                             } catch (NullPointerException | StringIndexOutOfBoundsException e) {
                                 parentEmail = null;
@@ -1290,7 +1203,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
 
                                 String duration;
                                 String partyPlace;
-                                Integer idPlace;
+                                Integer idPlace = null;
                                 String animator;
                                 String extraAnimator;
                                 String parentName;
@@ -1302,73 +1215,128 @@ public class BirthdayServiceImpl implements BirthdaysService {
                                 Integer childBDayAge;
 
                                 try {
-                                    birthDayProgType = row.get(5).toString();
+                                    birthDayProgType = row.get(4).toString();
+                                    idBirthDayProgType = getIdBDayProgType(birthDayProgType);
                                 } catch (NullPointerException b) {
                                     birthDayProgType = null;
+                                    idBirthDayProgType=null;
                                 }
-                                idBirthDayProgType = getIdBDayProgType(birthDayProgType);
 
                                 try {
-                                    birthdayPartyType = row.get(6).toString();
+                                    birthdayPartyType = row.get(5).toString();
+                                    idBirthdayPartyType = getIdBDayProgType(birthdayPartyType);
                                 } catch (NullPointerException b) {
                                     birthdayPartyType = null;
-                                }
-                                idBirthdayPartyType = getIdBDayProgType(birthdayPartyType);
-
-                                try {
-                                    duration = row.get(7).toString();
-                                } catch (NullPointerException b) {
-                                    duration = null;
+                                    idBirthdayPartyType=null;
                                 }
 
+                                String extraProgram = null;
+
                                 try {
-                                    partyPlace = row.get(9).toString();
+                                    extraProgram = row.get(6).toString();
+                                }catch (NullPointerException e ) {
+
+                                }
+
+                                Integer idExtraProgram = null;
+                                if(extraProgram != null) {
+                                    idExtraProgram = getIdExtraProgram(extraProgram);
+                                }
+
+                                String extraProgramSubType = null;
+                                Integer idExtraProgramSubType = null;
+
+                                try {
+                                    extraProgramSubType = row.get(7).toString();
+                                }catch (NullPointerException e) {
+
+                                }
+
+                                if (extraProgramSubType != null) {
+                                    idExtraProgramSubType = getIdExtraProgramSubType(extraProgramSubType);
+
+                                }
+
+                                try {
+                                    partyPlace = row.get(10).toString();
                                 } catch (NullPointerException b) {
                                     partyPlace = null;
                                 }
-                                idPlace = getIdPlace(partyPlace);
+                                if(partyPlace != null) {
+                                    idPlace = getIdPlace(partyPlace);
+
+                                }
                                 try {
-                                    animator = row.get(10).toString();
+                                    animator = row.get(11).toString();
                                 } catch (NullPointerException b) {
                                     animator = null;
                                 }
                                 try {
-                                    extraAnimator = row.get(12).toString();
+                                    extraAnimator = row.get(13).toString();
                                 } catch (NullPointerException b) {
                                     extraAnimator = null;
                                 }
                                 try {
-                                    parentName = row.get(27).toString();
-                                    parentLastName = row.get(28).toString();
+                                    parentName = row.get(28).toString();
+                                    parentLastName = row.get(29).toString();
                                 } catch (NullPointerException b) {
                                     parentName = null;
                                     parentLastName = null;
                                 }
                                 try {
-                                    childFirstName = row.get(19).toString();
-                                    childLastName = row.get(20).toString();
+                                    childFirstName = row.get(20).toString();
+                                    childLastName = row.get(21).toString();
                                 } catch (NullPointerException b) {
                                     childFirstName = null;
                                     childLastName = null;
                                 }
                                 try {
-                                    participantCount = Integer.parseInt(row.get(21).toString());
+                                    participantCount = Integer.parseInt(row.get(22).toString());
                                 } catch (NumberFormatException | NullPointerException b) {
                                     participantCount = null;
                                 }
                                 try {
-                                    childBDayAge = Integer.parseInt(row.get(22).toString());
+                                    childBDayAge = Integer.parseInt(row.get(23).toString());
                                 } catch (NullPointerException | NumberFormatException b) {
                                     childBDayAge = null;
                                 }
+
+                                String phone = null;
+
+                                try {
+                                    phone = row.get(27).toString();
+                                }catch (NullPointerException b) {
+
+                                }
+                                String inviteComments = null;
+                                try {
+                                    inviteComments = row.get(8).toString();
+                                }catch (NullPointerException e) {
+
+                                }
+                                Integer minAge =null;
+                                Integer maxAge = null;
+
+                                try {
+                                    minAge = Integer.valueOf(row.get(24).toString());
+                                }catch (NullPointerException | NumberFormatException e ) {
+
+                                }
+
+                                try {
+                                    maxAge = Integer.valueOf(row.get(25).toString());
+                                }catch (NullPointerException | NumberFormatException e) {
+
+                                }
+
                                 Birthdays birthday = new Birthdays();
 
                                 birthday.setParticipantCount(participantCount);
                                 birthday.setParentEmail(parentEmail);
-                                birthday.setDuration(duration);
+                                birthday.setIdExtraProgram(idExtraProgram);
+                                birthday.setIdExtraProgramSubType(idExtraProgramSubType);
                                 birthday.setIdLocation(idLocation);
                                 birthday.setIdPlace(idPlace);
-                                birthday.setDuration(duration);
                                 birthday.setParentFirstName(parentName);
                                 birthday.setParentLastName(parentLastName);
                                 birthday.setChildFirstName(childFirstName);
@@ -1385,6 +1353,10 @@ public class BirthdayServiceImpl implements BirthdaysService {
                                 birthday.setIdBDayPartyType(idBirthdayPartyType);
                                 birthday.setIdBDayProgType(idBirthDayProgType);
                                 birthday.setUpcoming(1);
+                                birthday.setPhone(phone);
+                                birthday.setInviteComments(inviteComments);
+                                birthday.setMaxAge(maxAge);
+                                birthday.setMinAge(minAge);
 
                                 birthdaysRepository.save(birthday);
                             }
@@ -1397,417 +1369,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
 
     }
 
-    @Override
-    public void mapSheetImportSaveToDBNEW(String sheetId, String sheetName, Integer idLocation) throws IOException {
 
-        List<List<Object>> sheet = googleSheetsService.readSheetRangeFrom(sheetId, sheetName, "A1500:V90000");
-
-        for (List<Object> row : sheet) {
-
-            Boolean dontSave = false;
-            Boolean error = false;
-            ErrorLog errorToDB = new ErrorLog();
-            errorToDB.setReadData(row.toString());
-            errorToDB.setSheet(sheetName);
-
-            String errorField = null;
-            String errorMessage = null;
-
-            LocalDate date;
-            try {
-                date = LocalDate.parse(row.get(0).toString(), formatterDMYOnly);
-
-            } catch (DateTimeParseException e) {
-                date = LocalDate.of(1999, 1, 1);
-
-                errorField += "date ";
-                error = true;
-                errorMessage += e.getMessage();
-
-            }
-            LocalTime startTime;
-            try {
-                startTime = LocalTime.parse(row.get(1).toString(), formatterHMSOnly);
-
-            } catch (DateTimeParseException | IndexOutOfBoundsException e) {
-                try {
-                    startTime = LocalTime.parse(row.get(1).toString(), formatterHMOnly);
-                } catch (DateTimeParseException | IndexOutOfBoundsException f){
-                    startTime = LocalTime.of(0, 0, 0);
-                    errorField += "startTime ";
-                    errorMessage += f.getMessage();
-                    error = true;
-
-                }
-            }
-
-            LocalTime endTime;
-            try {
-                endTime = LocalTime.parse(row.get(2).toString(), formatterHMSOnly);
-            } catch (DateTimeParseException | IndexOutOfBoundsException e) {
-                try {
-                    endTime = LocalTime.parse(row.get(2).toString(), formatterHMOnly);
-                } catch (DateTimeParseException | IndexOutOfBoundsException f) {
-                    endTime = LocalTime.of(0, 0, 0);
-                    errorField += "endTime ";
-                    errorMessage += f.getMessage();
-                    error = true;
-                }
-
-            }
-
-            String birthdayProgType;
-            try {
-                birthdayProgType = row.get(3).toString();}
-            catch (IndexOutOfBoundsException e ) {
-                birthdayProgType = null;
-                errorField += "birthdayProgType ";
-                errorMessage += e.getMessage();
-                error = true;
-
-            }
-            String birthdayPartyType;
-            try {
-                birthdayPartyType = row.get(4).toString();}
-            catch (IndexOutOfBoundsException e) {
-                birthdayPartyType = null;
-                errorField += "birthdayPartyType ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
-
-            String extraProgramType = null;
-            String extraProgramSubType = null;
-            String partyPlaceName;
-            String animator = null;
-            String extraAnimator = null ;
-            String childFirstName = null;
-            String childLastName = null;
-
-            try {
-                extraProgramType = row.get(5).toString();
-            } catch (IndexOutOfBoundsException e) {
-                extraProgramType = null;
-                errorField += "duration ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
-
-            try{
-                extraProgramSubType = row.get(6).toString();
-            } catch ( IndexOutOfBoundsException e) {
-
-            }
-
-            try {
-                partyPlaceName = row.get(7).toString();
-            } catch (IndexOutOfBoundsException e) {
-                partyPlaceName = null;
-                errorField += "partyPlaceName ";
-                error = true;
-                errorMessage += e.getMessage();
-
-            }
-            try {
-                animator = row.get(8).toString();
-                extraAnimator = row.get(9).toString();
-                childFirstName = row.get(10).toString();
-                childLastName = row.get(11).toString();
-            }
-            catch (IndexOutOfBoundsException e ) {
-                dontSave = true;
-                errorField += "animator childFirstName childLastName ";
-                error = true;
-                errorMessage += e.getMessage();
-            }
-
-            Integer participantCount;
-            try {
-                participantCount = Integer.parseInt(row.get(11).toString());
-            } catch (NumberFormatException | IndexOutOfBoundsException e ) {
-                participantCount = 0;
-                errorField += "participantCount ";
-                error = true;
-                errorMessage += e.getMessage();
-
-            }
-            Integer childBDayAge;
-            if (row.size() > 13) {
-                try {
-                    childBDayAge = Integer.parseInt(row.get(14).toString());
-                } catch (NumberFormatException e) {
-                    childBDayAge = 0;
-                    errorField += "childBdayAge ";
-                    error = true;
-                    errorMessage += e.getMessage();
-                }
-            } else {
-                childBDayAge = 0;
-            }
-
-
-            String parentEmail;
-            String parentName;
-            String parentLastName;
-            String contactReservationType;
-            if (row.size() > 19) {
-                parentEmail = row.get(16).toString();
-                parentName = row.get(18).toString();
-                parentLastName = row.get(19).toString();
-                contactReservationType = row.get(20).toString();
-            } else {
-                parentEmail = "";
-                parentName = "";
-                parentLastName = "";
-                contactReservationType = "";
-                dontSave = true;
-            }
-            Integer idPlace = null;
-            Integer idContactResType = null;
-            Integer idBDayProgType = null;
-            Integer idBirthdayPartyType = null;
-
-            if(partyPlaceName != null){
-                idPlace = getIdPlace(partyPlaceName);
-            }
-            if(contactReservationType != null){
-                idContactResType = getIdContactResType(contactReservationType);
-
-            }
-            if (birthdayPartyType != null) {
-                idBirthdayPartyType = getIdBirthdayPartyType(birthdayPartyType);
-            }
-            if(birthdayProgType != null ){
-                idBDayProgType = getIdBDayProgType(birthdayProgType);
-
-            }
-            Integer idExtraProgramType =null;
-           if(extraProgramType != null ){
-               idExtraProgramType = getIdExtraProgram(extraProgramType);
-           }
-            Integer idExtraProgramSubType = null;
-
-           if(extraProgramSubType != null){
-               idExtraProgramSubType = getIdExtraProgramSubType(extraProgramSubType);
-           }
-
-            LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
-            LocalDateTime dateTo = LocalDateTime.of(date, endTime);
-            Integer locationId = idLocation;
-
-
-
-            if (parentEmail == null || parentEmail.isBlank()) {
-                dontSave = true;
-            } else {
-
-                Birthdays birthday = setBirthdaysAndActive1NEW(idLocation,participantCount,parentEmail,idPlace,
-                        parentName,parentLastName,idContactResType,childFirstName,childLastName,birthdayPartyType,
-                        birthdayProgType,childBDayAge,dateFrom,dateTo,animator,extraAnimator,idBirthdayPartyType,partyPlaceName,
-                        idBDayProgType,idExtraProgramType,idExtraProgramSubType,extraProgramSubType);
-
-
-                if(error = true){
-                    errorToDB.setDateFrom(dateFrom);
-                    errorToDB.setDateTo(dateTo);
-                    errorToDB.setParentEmail(parentEmail);
-                    errorToDB.setErrorField(errorField);
-                    errorToDB.setErrorMessage(errorMessage);
-                    /*errorLogRepository.save(errorToDB);*/   //Od komentiri ce rabs errorLog
-                }
-                try {
-                    if (birthdaysRepository.findByParentEmailAndDateFromAndChildFirstNameAndIdLocation(parentEmail, dateFrom, childFirstName, idLocation).isEmpty()) {
-                        birthdaysRepository.save(birthday);
-                    }
-                }catch (Exception e) {
-                    logger.info("error" + e.getMessage());
-
-                }
-            }
-
-        }
-    }
-
-    @Override
-    public void mapAndSaveUpcomingBirthdaysNEW(String sheetId, String sheetName, Integer idLocation) throws IOException {
-        birthdaysRepository.deleteUpcomingBdays(idLocation);
-        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId,sheetName,"B3:AN12000");
-        for(List<Object> row : sheetData) {
-            try {
-                LocalDate date = LocalDate.parse(row.get(0).toString(), formatterDMYOnly);
-                if (date.isAfter(LocalDate.now().minusDays(1))) {
-                    String parentEmail;
-                    try {
-                        parentEmail = row.get(26).toString(); // prever indexe še enkrat !!
-                        logger.info("email: " + parentEmail);
-                    } catch (NullPointerException | StringIndexOutOfBoundsException e) {
-                        parentEmail = null;
-                    }
-
-                    if (parentEmail.isEmpty()) {
-
-                    } else {
-                        //Nared ERROR handling za vse še !!!
-
-                        LocalTime startTime;
-                        LocalTime endTime;
-                        try {
-                            startTime = LocalTime.parse(row.get(2).toString(), formatterHMOnly);
-                        } catch (DateTimeParseException | NullPointerException e) {
-                            try {
-                                startTime = LocalTime.parse(row.get(2).toString(), formatterHMSOnly);
-                            } catch (DateTimeParseException | NullPointerException f) {
-                                startTime = LocalTime.of(23, 59, 59);
-                            }
-                        }
-
-                        try {
-                            endTime = LocalTime.parse(row.get(3).toString(), formatterHMOnly);
-                        } catch (DateTimeParseException | NullPointerException e2) {
-                            try {
-                                endTime = LocalTime.parse(row.get(3).toString(), formatterHMSOnly);
-                            } catch (DateTimeParseException | NullPointerException f2) {
-                                endTime = LocalTime.of(23, 59, 59);
-                            }
-                        }
-                        LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
-                        LocalDateTime dateTo = LocalDateTime.of(date, endTime);
-
-                        Integer idBirthDayProgType = null;
-                        String birthDayProgType;
-
-                        String birthdayPartyType;
-                        Integer idBirthdayPartyType = null;
-
-                        String extraProgramType = null;
-                        String extraProgramSubType = null;
-                        String partyPlace;
-                        Integer idPlace;
-                        String animator;
-                        String extraAnimator;
-                        String parentName;
-                        String parentLastName;
-                        String childFirstName;
-                        String childLastName;
-
-                        Integer participantCount;
-                        Integer childBDayAge;
-
-                        try {
-                            birthDayProgType = row.get(4).toString();
-                        } catch (NullPointerException e) {
-                            birthDayProgType = null;
-                        }
-                        if(birthDayProgType != null){
-                            idBirthDayProgType = getIdBDayProgType(birthDayProgType);
-                        }
-
-                        try {
-                            birthdayPartyType = row.get(5).toString();
-                        } catch (NullPointerException e) {
-                            birthdayPartyType = null;
-                        }
-                        if(birthdayPartyType != null){
-                            idBirthdayPartyType = getIdBDayProgType(birthdayPartyType);
-
-                        }
-
-                        try {
-                             extraProgramType = row.get(6).toString();
-                        } catch ( NullPointerException ignored) {
-                        }
-                        Integer idExtraProgramType;
-                        if(extraProgramType != null){
-
-                        }
-
-                        try {
-                            extraProgramSubType = row.get(7).toString();
-                        } catch (NullPointerException ignored) {
-
-                        }
-
-                        try {
-                            partyPlace = row.get(10).toString();
-                        } catch (NullPointerException b) {
-                            partyPlace = null;
-                        }
-                        idPlace = getIdPlace(partyPlace);
-                        try {
-                            animator = row.get(11).toString();
-                        } catch (NullPointerException b) {
-                            animator = null;
-                        }
-                        try {
-                            extraAnimator = row.get(13).toString();
-                        } catch (NullPointerException b) {
-                            extraAnimator = null;
-                        }
-                        try {
-                            parentName = row.get(28).toString();
-                            parentLastName = row.get(29).toString();
-                        } catch (NullPointerException b) {
-                            parentName = null;
-                            parentLastName = null;
-                        }
-                        try {
-                            childFirstName = row.get(20).toString();
-                            childLastName = row.get(21).toString();
-                        } catch (NullPointerException b) {
-                            childFirstName = null;
-                            childLastName = null;
-                        }
-                        try {
-                            participantCount = Integer.parseInt(row.get(22).toString());
-                        } catch (NumberFormatException | NullPointerException b) {
-                            participantCount = null;
-                        }
-                        try {
-                            childBDayAge = Integer.parseInt(row.get(23).toString());
-                        } catch (NullPointerException | NumberFormatException b) {
-                            childBDayAge = null;
-                        }
-
-                        String phone = null;
-                        try {
-                            phone = row.get(27).toString();
-                        }catch (Exception ignored){
-
-                        }
-                        Birthdays birthday = new Birthdays();
-
-                        birthday.setParticipantCount(participantCount);
-                        birthday.setParentEmail(parentEmail);
-                        birthday.setIdLocation(idLocation);
-                        birthday.setIdPlace(idPlace);
-                        birthday.setParentFirstName(parentName);
-                        birthday.setParentLastName(parentLastName);
-                        birthday.setChildFirstName(childFirstName);
-                        birthday.setChildLastName(childLastName);
-                        birthday.setBirthdayPartyType(birthdayPartyType);
-                        birthday.setBirthdayProgType(birthDayProgType);
-                        birthday.setChildBDayAge(childBDayAge);
-                        birthday.setDateFrom(dateFrom);
-                        birthday.setDateTo(dateTo);
-                        birthday.setAnimator(animator);
-                        birthday.setDodatniAnimator(extraAnimator);
-                        birthday.setIdBDayPartyType(idBirthdayPartyType);
-                        birthday.setIdPartyPlaceName(partyPlace);
-                        birthday.setIdBDayPartyType(idBirthdayPartyType);
-                        birthday.setIdBDayProgType(idBirthDayProgType);
-                        birthday.setUpcoming(1);
-                        birthday.setPhone(phone);
-
-                        birthdaysRepository.save(birthday);
-                    }
-                }
-            } catch (IndexOutOfBoundsException e) {
-                logger.info("indexOutofbounds");
-                break;
-            }
-        }
-
-    }
 
     @Override
     public void getDatesAndTimeForBirthdays(String sheetId, String sheetName) throws IOException {

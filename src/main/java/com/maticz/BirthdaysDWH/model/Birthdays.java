@@ -111,4 +111,13 @@ public class Birthdays {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "inviteComments")
+    private String inviteComments;
+
+    @Column(name = "minAge")
+    private Integer minAge;
+
+    @Column(name = "maxAge")
+    private Integer maxAge;
 }

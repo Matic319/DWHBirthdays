@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -50,9 +51,11 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
     }
 
     private void insertText(PDPageContentStream contentStream, String text, float xInches, float yInches,
-                            float pageHeightInPoints, float fontSize) throws IOException {
+                            float pageHeightInPoints, float fontSize, PDDocument document) throws IOException {
         contentStream.beginText();
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), fontSize);
+        PDType0Font font = PDType0Font.load(document, PDType0Font.class.getResourceAsStream("/montserrat.ttf"), true);
+
+        contentStream.setFont(font, fontSize);
         float x = inchesToPoints(xInches);
         float y = pageHeightInPoints - inchesToPoints(yInches);
         contentStream.newLineAtOffset(x, y);
@@ -86,25 +89,25 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                 contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110);
-                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
-                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
-                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
-                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28);
-                insertText(contentStream, convertPhoneNumber(phone), 2.8f, 8.42f, pageHeightInPoints, 30);
+                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110,document);
+                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30,document);
+                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30,document);
+                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30,document);
+                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28,document);
+                insertText(contentStream, convertPhoneNumber(phone), 2.8f, 8.42f, pageHeightInPoints, 30,document);
 
                 if (childName.contains(" in ") || childName.contains("&")) {
-                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[1], 5.7f, 11.2f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[1], 5.7f, 11.2f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30,document);
                 } else if (childName.length() > 14) {
-                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[1], 5.6f, 11.2f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[1], 5.6f, 11.2f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30,document);
                 } else if (childName.length() < 8) {
-                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50);
+                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50,document);
                 } else {
-                    insertText(contentStream, childName, 5.1f, 11.3f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName, 5.1f, 11.3f, pageHeightInPoints, 30,document);
                 }
             }
 
@@ -145,25 +148,25 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                 contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110);
-                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30);
-                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30);
-                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30);
-                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28);
-                insertText(contentStream, convertPhoneNumber(phone), 2.8f, 8.42f, pageHeightInPoints, 30);
+                insertText(contentStream, age, 1.5f, 5.3f, pageHeightInPoints, 110,document);
+                insertText(contentStream, dateFrom, 4.5f, 3.75f, pageHeightInPoints, 30,document);
+                insertText(contentStream, time, 4.5f, 4.65f, pageHeightInPoints, 30,document);
+                insertText(contentStream, locationName(idLocation), 4.5f, 5.6f, pageHeightInPoints, 30,document);
+                insertText(contentStream, locationAddress(idLocation), 4.5f, 6.4f, pageHeightInPoints, 28,document);
+                insertText(contentStream, convertPhoneNumber(phone), 2.8f, 8.42f, pageHeightInPoints, 30,document);
 
                 if (childName.contains(" in ") || childName.contains("&")) {
-                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[1], 5.7f, 11.2f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[1], 5.7f, 11.2f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30,document);
                 } else if (childName.length() > 14) {
-                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[1], 5.6f, 11.2f, pageHeightInPoints, 30);
-                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName.split(" ")[0], 5.35f, 10.7f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[1], 5.6f, 11.2f, pageHeightInPoints, 30,document);
+                    insertText(contentStream, childName.split(" ")[2], 5.35f, 11.65f, pageHeightInPoints, 30,document);
                 } else if (childName.length() < 8) {
-                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50);
+                    insertText(contentStream, childName, 5.25f, 11.3f, pageHeightInPoints, 50,document);
                 } else {
-                    insertText(contentStream, childName, 5.1f, 11.3f, pageHeightInPoints, 30);
+                    insertText(contentStream, childName, 5.1f, 11.3f, pageHeightInPoints, 30,document);
                 }
             }
 
@@ -217,7 +220,8 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
                 try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                    // contentStream.setNonStrokingColor(1f, 1f, 1f);
 
-                    insertTextIntoBDayForm(date, time, partyType, childName, childSurname, participantCount, age, phone, partyPlace, contentStream, pageHeightInPoints);
+                   /* insertTextIntoBDayForm(date,startTime,endTime,partyType,
+                            childName,childSurname,participantCount,contentStream, pageHeightInPoints);*/
                 }
 
                 document.save(outputFilePath);
@@ -227,8 +231,9 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
 
     @Override
-    public byte[] createPdfInMemoryBDayForm(String date, String time, String partyType, String childName, String childSurname,
-                                            String participantCount, String age, String phone, String partyPlace) throws IOException {
+    public byte[] createPdfInMemoryBDayForm(String date, String starTime,String endTime,  String partyProgram, String childName, String childSurname,
+                                            String participantCount, String age, String phone, String partyPlace, String minAge, String maxAge, String parentName,
+                                            String comments, String animator, String partySubProgram) throws IOException {
         try (InputStream inputStream = getClass().getResourceAsStream("/obrazec.pdf");
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
@@ -239,7 +244,9 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
 
-                insertTextIntoBDayForm(date,time,partyType,childName,childSurname,participantCount,age,phone,partyPlace,contentStream,pageHeightInPoints);
+                insertTextIntoBDayForm(date,starTime,endTime,partyProgram,childName,childSurname,participantCount,
+                        age,phone,partyPlace,contentStream,pageHeightInPoints,
+                        parentName,comments,minAge,maxAge,animator,partySubProgram,document);
             }
 
             document.save(outputStream);
@@ -249,18 +256,53 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
         }
     }
 
-    private void insertTextIntoBDayForm(String date, String time, String partyType, String childName, String childSurname,
+    private void insertTextIntoBDayForm(String date, String startTime,String endTime, String partyProgram, String childName, String childSurname,
                                         String participantCount, String age, String phone, String partyPlace,
-                                        PDPageContentStream contentStream, float pageHeightInPoints) throws IOException {
-        insertText(contentStream, date, 1.65f, 2.62f, pageHeightInPoints, 18);
-        insertText(contentStream, time, 2.0f, 3.0f, pageHeightInPoints, 18);
-        insertText(contentStream, partyType, 2.4f, 3.35f, pageHeightInPoints, 18);
-        insertText(contentStream, partyPlace, 1.95f, 3.7f, pageHeightInPoints, 18);
-        insertText(contentStream, childName, 2.2f, 4.45f, pageHeightInPoints, 18);
-        insertText(contentStream, childSurname, 2.5f, 4.85f, pageHeightInPoints, 18);
-        insertText(contentStream, phone, 2.1f, 5.2f, pageHeightInPoints, 18);
-        insertText(contentStream, participantCount, 1.75f, 5.9f, pageHeightInPoints, 18);
-        insertText(contentStream, age, 1.75f, 6.3f, pageHeightInPoints, 18);
+                                        PDPageContentStream contentStream, float pageHeightInPoints, String parentName,
+                                        String comments, String minAge, String maxAge, String animator,String partySubProgram, PDDocument document) throws IOException {
+
+
+
+        insertText(contentStream, date, 1.6f, 1.8f, pageHeightInPoints, 18,document);
+        insertText(contentStream, startTime + " - " + endTime, 2.0f, 2.15f, pageHeightInPoints, 18,document);
+        insertText(contentStream, partyProgram, 2.4f, 2.52f, pageHeightInPoints, 18,document);
+        insertText(contentStream, partySubProgram, 2.4f, 2.88f, pageHeightInPoints, 18,document);
+        insertText(contentStream, partyPlace, 1.95f, 3.25f, pageHeightInPoints, 18,document);
+        insertText(contentStream, childName, 2.2f, 3.95f, pageHeightInPoints, 18,document);
+        insertText(contentStream, childSurname, 2.5f, 4.35f, pageHeightInPoints, 18,document);
+
+        String convertedPhoneNumber = phone != null ? convertPhoneNumber(phone) : " ";
+        insertText(contentStream, convertedPhoneNumber + "  " + parentName, 2.1f, 4.7f, pageHeightInPoints, 18,document);
+
+        insertText(contentStream, participantCount, 1.75f, 5.45f, pageHeightInPoints, 18,document);
+        insertText(contentStream, age, 2.45f, 5.82f, pageHeightInPoints, 18,document);
+        insertText(contentStream, minAge, 4.55f, 5.82f, pageHeightInPoints, 18,document);
+        insertText(contentStream, maxAge, 7.05f, 5.82f, pageHeightInPoints, 18,document);
+        insertText(contentStream, animator, 5.4f, 3.25f, pageHeightInPoints, 18,document);
+
+        if (comments.length() > 72) {
+            StringBuilder sb = new StringBuilder();
+            String[] words = comments.split(" ");
+            int currentLength = 0;
+
+            for (String word : words) {
+                if (currentLength + word.length() <= 72) {
+                    sb.append(word).append(" ");
+                    currentLength += word.length() + 1;
+                } else {
+                    break;
+                }
+            }
+
+            insertText(contentStream, sb.toString(), 1.95f, 6.55f, pageHeightInPoints, 11, document);
+
+            if (currentLength < comments.length()) {
+                String remainingComments = comments.substring(sb.length()).trim();
+                insertText(contentStream, remainingComments, 0.2f, 6.9f, pageHeightInPoints, 11, document);
+            }
+        } else {
+            insertText(contentStream, comments, 1.95f, 6.5f, pageHeightInPoints, 18, document);
+        }
     }
 }
 

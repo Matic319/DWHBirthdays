@@ -19,6 +19,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -124,24 +125,35 @@ public class MailSendingServiceImpl implements MailSendingService {
         MimeMessageHelper helper = new MimeMessageHelper(message,true);
 
         helper.setTo(sendTo);
-        helper.setSubject("RD obrazci");
+        helper.setSubject("RD obrazci " + LocalDate.now().plusDays(1).toString());
         helper.setText("lp");
 
 
         for (Object[] row : getFormDataList) {
-            LocalDateTime dateTime = LocalDateTime.parse(row[0].toString(),formatterDB);
-            String date = dateTime.format(formatterInviteDate);
-            String time = dateTime.format(formatterInviteTime);
+            LocalDateTime dateTimeStart = LocalDateTime.parse(row[0].toString(),formatterDB);
+            LocalDateTime dateTimeEnd = LocalDateTime.parse(row[13].toString(),formatterDB);
+            String date = dateTimeStart.format(formatterInviteDate);
+            String startTime = dateTimeStart.format(formatterInviteTime);
             String programName = row[1].toString();
-            String partyPlace = row[2].toString();
-            String childName = row[3].toString();
-            String childSurname = row[4].toString();
-            String age = row[5].toString();
-            String phone = row[6] != null ? row[6].toString() : "";
-            String participantCount = row[7].toString();
+            String subProgramName = row[2] != null ? row[2].toString() :null;
+            String partyPlace = row[3] != null ? row[3].toString() : null;
+            String childName = row[4].toString();
+            String childSurname = row[5].toString();
+            String age = row[6] != null ? row[6].toString() : null ;
+            String phone = row[7] != null ? row[7].toString() : null;
+            String participantCount = row[8] != null ? row[8].toString() : null;
+            String parentFirstname = row[9] != null ? row[9].toString() : null;
+            String minAge = row[10] != null ? row[10].toString() : null;
+            String maxAge = row[11] != null ? row[11].toString() : null;
+            String endTime = dateTimeEnd.format(formatterInviteTime);
+            String inviteComments = row[12] != null ? row[12].toString() : null;
+            String animator = row[14] != null ? row[14].toString() : null;
 
-            byte[] attachment = pdfTextInsertionService.createPdfInMemoryBDayForm(date,time,
-                    programName,childName,childSurname,participantCount,age,phone,partyPlace);
+
+
+            byte[] attachment = pdfTextInsertionService.createPdfInMemoryBDayForm(date,startTime,endTime,
+                    programName, childName,childSurname,participantCount,age,phone,partyPlace,
+                    minAge,maxAge,parentFirstname,inviteComments,animator, subProgramName);
 
             helper.addAttachment(childName + "_" + childSurname + ".pdf",new ByteArrayResource(attachment));
         }

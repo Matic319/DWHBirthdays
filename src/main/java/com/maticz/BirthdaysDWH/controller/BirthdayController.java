@@ -153,12 +153,6 @@ public class BirthdayController {
         birthdayServiceImpl.mapSheetImportSaveToDB("1PMfyZBdvZaerqX86GZoZF27HAr92OgoYm6bSsvBKGdo","RD Rudnik",5);
         return ResponseEntity.ok("ok");
     }
-    @GetMapping("importMS")
-    public ResponseEntity<String> importMS() throws IOException {
-
-        birthdayServiceImpl.mapSheetImportSaveToDB("1arCEVrJfx-4hZSfR4_aFT4_9u-v7aT1nhCGsda_JM-I","RD MS", 4);
-        return ResponseEntity.ok("ok");
-    }
 
 
     @GetMapping("/importMSfrom{date}")

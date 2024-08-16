@@ -38,19 +38,43 @@ public interface BirthdaysRepository extends JpaRepository<Birthdays,Long> {
     void deleteUpcomingBdays(@RequestParam("idLocation") Integer idLocation);
 
     @Query
-            (value = " select dateFrom \n" +
-                    ",birthdayProgType + ' ' +birthdayPartyType +' ' +\n" +
-                    "case when idExtraProgram = 2 then 'Cosmic'\n" +
-                    "\twhen idextraProgram = 1 then  \n" +
-                    "\t\t(select extraProgramName from DWH_Ref_extraPartyProgram b where a.idExtraProgram = b.idExtraProgram and a.idExtraProgramSubType = b.idExtraProgramSubType)\n" +
-                    "\t\telse '' end\n" +
-                    "+ ' ' + case when idExtraProgramSubType is not null then\n" +
-                    "\t\t(select extraProgramSubTypeName from DWH_Ref_extraPartyProgram c where a.idExtraProgram = c.idExtraProgram and a.idExtraProgramSubType = c.idExtraProgramSubType) else '' end progName\n" +
-                    ",idPartyPlaceName, childFirstName, childLastName, childBDayAge, phone, \n" +
-                    "   participantCount   \n" +
-                    "    from DWH_Fact_Birthdays a\n" +
-                    " where upcoming = 1 and idLocation = :idLocation \n" +
-                    "                    and cast(dateFrom as date) = cast(dateadd(day,1,GETDATE()) as date) ", nativeQuery = true)
+            (value = " select dateFrom, \n" +
+                    " CONCAT( \n" +
+                    "  BirthdayProgType, ' ',  \n" +
+                    "  birthdayPartyType, ' ') program ,  \n" +
+                    " concat(  case  \n" +
+                    "    when idExtraProgram = 2 then 'Cosmic' \n" +
+                    "    when idExtraProgram = 1 then ( \n" +
+                    "                                    select extraProgramName  \n" +
+                    "                                    from DWH_Ref_extraPartyProgram b  \n" +
+                    "                                    where a.idExtraProgram = b.idExtraProgram  \n" +
+                    "                                      and a.idExtraProgramSubType = b.idExtraProgramSubType \n" +
+                    ") \n" +
+                    "    else ' ' END, ' ',\n" +
+                    "     case  \n" +
+                    "      when idExtraProgramSubType is not null then ( \n" +
+                    "         select extraProgramSubTypeName  \n" +
+                    "            from DWH_Ref_extraPartyProgram c  \n" +
+                    "               where a.idExtraProgram = c.idExtraProgram  \n" +
+                    "                 and a.idExtraProgramSubType = c.idExtraProgramSubType \n" +
+                    "               ) \n" +
+                    "    else ' ' end ) as progSubName, \n" +
+                    "idPartyPlaceName,  \n" +
+                    "childFirstName,  \n" +
+                    "childLastName,  \n" +
+                    "childBDayAge,  \n" +
+                    "phone,  \n" +
+                    "participantCount,\n" +
+                    "parentFirstName,\n" +
+                    "minAge,\n" +
+                    "maxAge,\n" +
+                    "inviteComments,\n" +
+                    "dateTo, animator\n" +
+                    "\n" +
+                    "  from DWH_Fact_Birthdays a \n" +
+                    " where upcoming = 1  \n" +
+                    "  and idLocation = :idLocation  \n" +
+                    "  and cast(dateFrom as date) = cast(dateadd(day, 1, getdate()) as date) ", nativeQuery = true)
     List<Object[]> getBdayFormData(@Param("idLocation") Integer idLocation);
 
 }

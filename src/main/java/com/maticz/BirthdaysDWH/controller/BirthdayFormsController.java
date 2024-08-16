@@ -18,7 +18,7 @@ public class BirthdayFormsController {
     @Autowired
     MailSendingServiceImpl mailSendingService;
 
-    @Scheduled(cron = "0 0 14 * * *")
+    //@Scheduled(cron = "0 0 14 * * *")
     @GetMapping("/send")
     public ResponseEntity<String> sendBirthdayForm() throws MessagingException, IOException {
         mailSendingService.sendBDayForm(1,"info@woop.fun");
@@ -26,6 +26,14 @@ public class BirthdayFormsController {
         mailSendingService.sendBDayForm(3,"infoarena@woop.fun");
         mailSendingService.sendBDayForm(5,"inforudnik@woop.fun");
         mailSendingService.sendBDayForm(6,"infomb@woop.fun");
+
+        return ResponseEntity.ok("ok");
+
+    }
+
+    @GetMapping("/sendTest")
+    public ResponseEntity<String> Test() throws MessagingException, IOException {
+        mailSendingService.sendBDayForm(1,"matic.zigon@woop.fun");
 
         return ResponseEntity.ok("ok");
 
