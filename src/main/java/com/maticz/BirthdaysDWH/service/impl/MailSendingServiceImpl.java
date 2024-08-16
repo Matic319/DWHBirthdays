@@ -8,6 +8,7 @@ import com.maticz.BirthdaysDWH.service.PDFTextInsertionService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,6 +20,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -120,26 +122,30 @@ public class MailSendingServiceImpl implements MailSendingService {
     public void sendBDayForm(Integer idLocation, String sendTo) throws MessagingException, IOException {
         List<Object[]> getFormDataList = birthdaysRepository.getBdayFormData(idLocation);
 
+        if (getFormDataList.isEmpty()) {
+            return;
+        }
 
         MimeMessage message = mailSenderMatic.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(sendTo);
         helper.setSubject("RD obrazci " + LocalDate.now().plusDays(1).toString());
         helper.setText("lp");
 
+        boolean hasAttachments = false;
 
         for (Object[] row : getFormDataList) {
-            LocalDateTime dateTimeStart = LocalDateTime.parse(row[0].toString(),formatterDB);
-            LocalDateTime dateTimeEnd = LocalDateTime.parse(row[13].toString(),formatterDB);
+            LocalDateTime dateTimeStart = LocalDateTime.parse(row[0].toString(), formatterDB);
+            LocalDateTime dateTimeEnd = LocalDateTime.parse(row[13].toString(), formatterDB);
             String date = dateTimeStart.format(formatterInviteDate);
             String startTime = dateTimeStart.format(formatterInviteTime);
             String programName = row[1].toString();
-            String subProgramName = row[2] != null ? row[2].toString() :null;
+            String subProgramName = row[2] != null ? row[2].toString() : null;
             String partyPlace = row[3] != null ? row[3].toString() : null;
             String childName = row[4].toString();
             String childSurname = row[5].toString();
-            String age = row[6] != null ? row[6].toString() : null ;
+            String age = row[6] != null ? row[6].toString() : null;
             String phone = row[7] != null ? row[7].toString() : null;
             String participantCount = row[8] != null ? row[8].toString() : null;
             String parentFirstname = row[9] != null ? row[9].toString() : null;
@@ -149,15 +155,20 @@ public class MailSendingServiceImpl implements MailSendingService {
             String inviteComments = row[12] != null ? row[12].toString() : null;
             String animator = row[14] != null ? row[14].toString() : null;
 
+            byte[] attachment = pdfTextInsertionService.createPdfInMemoryBDayForm(date, startTime, endTime,
+                    programName, childName, childSurname, participantCount, age, phone, partyPlace,
+                    minAge, maxAge, parentFirstname, inviteComments, animator, subProgramName);
 
+            if (attachment != null && attachment.length > 0) {
+                helper.addAttachment(childName + "_" + childSurname + ".pdf", new ByteArrayResource(attachment));
+                hasAttachments = true;
+            }
 
-            byte[] attachment = pdfTextInsertionService.createPdfInMemoryBDayForm(date,startTime,endTime,
-                    programName, childName,childSurname,participantCount,age,phone,partyPlace,
-                    minAge,maxAge,parentFirstname,inviteComments,animator, subProgramName);
-
-            helper.addAttachment(childName + "_" + childSurname + ".pdf",new ByteArrayResource(attachment));
         }
-        mailSenderMatic.send(message);
+
+        if (hasAttachments) {
+            mailSenderMatic.send(message);
+        }
     }
 
     private void sendEmail(String toEmail, String childName, byte[] attachment, Integer idLocation, Context context) throws MessagingException {
