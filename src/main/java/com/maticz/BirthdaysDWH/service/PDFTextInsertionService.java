@@ -1,5 +1,7 @@
 package com.maticz.BirthdaysDWH.service;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,7 +30,9 @@ public interface PDFTextInsertionService {
     void insertTextIntoPdfFormForBDay(String outputFilePath, String date, String time, String partyType, String childName,
                                       String childSurname, String participantCount, String age, String phone, String partyPlace) throws IOException;
 
-    byte[] createPdfInMemoryBDayForm(String date, String starTime,String endTime,  String partyType, String childName, String childSurname,
-                                     String participantCount, String age, String phone, String partyPlace, String minAge, String maxAge, String parentName,
-                                     String comments, String animator, String partySubProgram) throws IOException;
+    byte[] createPdfInMemoryBDayForm(String date, String starTime, String endTime, String partyType, String childName, String childSurname,
+                                         String participantCount, String age, String phone, String partyPlace, String minAge, String maxAge, String parentName,
+                                         String comments, String animator, String partySubProgram) throws IOException;
+
+
 }

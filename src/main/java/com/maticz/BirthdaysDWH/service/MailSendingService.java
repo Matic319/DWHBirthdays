@@ -11,4 +11,5 @@ public interface MailSendingService {
     void sendBirthdayInvitationsEmail(Integer idLocation);
 
     void sendBDayForm(Integer idLocation, String sendTo) throws MessagingException, IOException;
+
 }

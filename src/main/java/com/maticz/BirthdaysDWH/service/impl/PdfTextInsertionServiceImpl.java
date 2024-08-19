@@ -8,8 +8,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 
@@ -197,7 +195,7 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             phoneNumber = "0" + phoneNumber.substring(phoneNumber.length() - 8);
             phoneNumber = phoneNumber.substring(0, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
         }
-        if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("+386") && !phoneNumber.startsWith("00") && phoneNumber.length() != 9) {
+        if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("+386") && !phoneNumber.startsWith("00") && phoneNumber.length() == 8) {
             phoneNumber = "0" + phoneNumber.substring(1, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
         } else {
             phoneNumber = phoneNumber.substring(0, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
@@ -255,7 +253,6 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             return outputStream.toByteArray();
         }
     }
-
     private void insertTextIntoBDayForm(String date, String startTime,String endTime, String partyProgram, String childName, String childSurname,
                                         String participantCount, String age, String phone, String partyPlace,
                                         PDPageContentStream contentStream, float pageHeightInPoints, String parentName,
@@ -304,6 +301,9 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             insertText(contentStream, comments, 1.95f, 6.5f, pageHeightInPoints, 18, document);
         }
     }
+
+
+
 }
 
 

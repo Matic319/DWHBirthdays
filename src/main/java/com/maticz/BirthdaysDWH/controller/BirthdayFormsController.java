@@ -33,8 +33,6 @@ public class BirthdayFormsController {
 
     @GetMapping("/sendTest")
     public ResponseEntity<String> test() throws MessagingException, IOException {
-        mailSendingService.sendBDayForm(1,"matic.zigon@woop.fun");
-
 
         return ResponseEntity.ok("ok");
 

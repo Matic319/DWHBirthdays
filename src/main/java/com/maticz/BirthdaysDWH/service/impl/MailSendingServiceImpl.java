@@ -8,7 +8,14 @@ import com.maticz.BirthdaysDWH.service.PDFTextInsertionService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
@@ -18,12 +25,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +37,8 @@ public class MailSendingServiceImpl implements MailSendingService {
 
     @Autowired
     BirthdayInvitationsRepository birthdayInvitationsRepository;
+
+    Logger logger = LoggerFactory.getLogger(MailSendingServiceImpl.class);
 
     @Autowired
     @Qualifier("maticEmail")
@@ -170,7 +178,6 @@ public class MailSendingServiceImpl implements MailSendingService {
             mailSenderMatic.send(message);
         }
     }
-
     private void sendEmail(String toEmail, String childName, byte[] attachment, Integer idLocation, Context context) throws MessagingException {
 
         MimeMessage message = setJavaMailSender(idLocation).createMimeMessage();
@@ -256,6 +263,8 @@ public class MailSendingServiceImpl implements MailSendingService {
             default -> "5";
         };
     }
+
+
 
 
 }
