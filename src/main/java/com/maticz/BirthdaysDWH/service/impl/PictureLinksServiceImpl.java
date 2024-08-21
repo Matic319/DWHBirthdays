@@ -128,7 +128,7 @@ public class PictureLinksServiceImpl implements PictureLinksService {
         for (Object[] row : emailAndLinkList) {
             try {
                 logger.info(row[0].toString() + " " + row[1].toString());
-                acService.sendToACPictureLink(row[0].toString(), row[1].toString());
+                acService.sendToACPictureLink(row[0].toString(), row[1].toString(),idLocation);
                 LocalDateTime date = LocalDateTime.parse(row[2].toString(), formatterSQL);
                 birthdayPicturesRepository.updateLink(idLocation, date, row[0].toString());
             } catch (HttpServerErrorException.BadGateway e) {

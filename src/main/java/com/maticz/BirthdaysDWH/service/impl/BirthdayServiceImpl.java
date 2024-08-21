@@ -1484,7 +1484,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
         return idContactResType;
     }
 
-    private static Integer getIdBDayProgType(String birthdayProgType) {
+    public  Integer getIdBDayProgType(String birthdayProgType) {
         Integer idBDayProgType;
         idBDayProgType = switch (birthdayProgType.toLowerCase().trim()) {
             case "jump", "skakalna zabava" -> 1;
@@ -1539,7 +1539,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
     }
 
 
-    private static Integer getIdBirthdayPartyType(String birthdayPartyType) {
+    public  Integer getIdBirthdayPartyType(String birthdayPartyType) {
         Integer idBirthdayPartyType;
         idBirthdayPartyType = switch (birthdayPartyType.toUpperCase().trim()) {
             case "LNZ ČAROBNI GOZD" -> 1;
@@ -1560,7 +1560,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
             case "LNZ VESOLJCI" -> 16;
             case "SUPER" -> 17;
             case "MEGA" -> 18;
-            case "VIP" -> 19;
+            case "VIP","ULTRA" -> 19;
             default -> 0;
         };
         return idBirthdayPartyType;
@@ -1612,7 +1612,7 @@ public class BirthdayServiceImpl implements BirthdaysService {
         };
     }
 
-    private static Integer getIdExtraProgramSubType(String extraProgramSubTypeName){
+    public static Integer getIdExtraProgramSubType(String extraProgramSubTypeName){
         return switch (extraProgramSubTypeName.trim().toLowerCase()) {
             case "pirati" -> 1;
             case "podvodni svet" -> 2;

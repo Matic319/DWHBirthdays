@@ -8,4 +8,6 @@ import java.io.IOException;
 public interface BirthdayInvitationsService {
 
     void mapAndSaveToInvitations(String sheetId, String sheetName, Integer idLocation ) throws IOException;
+
+    void mapAndSaveEmailInvitationData(String sheetId, String sheetName, Integer idLocation) throws IOException;
 }

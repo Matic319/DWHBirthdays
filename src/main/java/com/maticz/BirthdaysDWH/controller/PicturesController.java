@@ -1,7 +1,6 @@
 package com.maticz.BirthdaysDWH.controller;
 
 import com.maticz.BirthdaysDWH.service.impl.*;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 
 @RestController
@@ -80,7 +78,7 @@ public class PicturesController {
     @GetMapping("/MB")
     public ResponseEntity<String> getPicturesMB() throws IOException{
 
-        String sheetID = "1UPzVSOn8aOGG-JAIiHPHGO9k7R8N4C0Lnqze9uQhlpY";
+        String sheetID = "12kpvX_ui0yGlVW6BXeLAQYBntEtI264APyfTvpMSrSw";
         pictureLinksService.mapSheetAndSaveToDB(sheetID,"Maribor",6);
         pictureLinksService.updatePictureLinkInAC(6);
         pictureLinksService.updateEmailSentAndEmailOpened();

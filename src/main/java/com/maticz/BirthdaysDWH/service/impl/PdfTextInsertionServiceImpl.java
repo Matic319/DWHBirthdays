@@ -48,7 +48,8 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
         };
     }
 
-    private void insertText(PDPageContentStream contentStream, String text, float xInches, float yInches,
+    @Override
+    public void insertText(PDPageContentStream contentStream, String text, float xInches, float yInches,
                             float pageHeightInPoints, float fontSize, PDDocument document) throws IOException {
         contentStream.beginText();
         PDType0Font font = PDType0Font.load(document, PDType0Font.class.getResourceAsStream("/montserrat.ttf"), true);
@@ -61,7 +62,8 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
         contentStream.endText();
     }
 
-    private float inchesToPoints(float inches) {
+    @Override
+    public float inchesToPoints(float inches) {
         return inches * POINTS_PER_INCH;
     }
 
@@ -189,14 +191,12 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
     @Override
     public String convertPhoneNumber(String phone) {
-
         String phoneNumber = phone.trim().replaceAll("\\s", "");
-        if (phoneNumber.startsWith("+386") || phoneNumber.startsWith("00386")) {
+        if (phoneNumber.startsWith("+386") || phoneNumber.startsWith("00386") || phoneNumber.startsWith("386") || phoneNumber.startsWith("+")) {
             phoneNumber = "0" + phoneNumber.substring(phoneNumber.length() - 8);
             phoneNumber = phoneNumber.substring(0, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
-        }
-        if (!phoneNumber.startsWith("+") && !phoneNumber.startsWith("+386") && !phoneNumber.startsWith("00") && phoneNumber.length() == 8) {
-            phoneNumber = "0" + phoneNumber.substring(1, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
+        } else if (phoneNumber.length() == 8) {
+            phoneNumber = "0" + phoneNumber.substring(0, 2) + " " + phoneNumber.substring(2, 5) + " " + phoneNumber.substring(5);
         } else {
             phoneNumber = phoneNumber.substring(0, 3) + " " + phoneNumber.substring(3, 6) + " " + phoneNumber.substring(6);
         }
@@ -253,10 +253,16 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
             return outputStream.toByteArray();
         }
     }
+
+
+
+
+
     private void insertTextIntoBDayForm(String date, String startTime,String endTime, String partyProgram, String childName, String childSurname,
                                         String participantCount, String age, String phone, String partyPlace,
                                         PDPageContentStream contentStream, float pageHeightInPoints, String parentName,
                                         String comments, String minAge, String maxAge, String animator,String partySubProgram, PDDocument document) throws IOException {
+
 
 
 
@@ -304,6 +310,21 @@ public class PdfTextInsertionServiceImpl implements PDFTextInsertionService {
 
 
 
+
+    public String setAttractionText(Integer idProgType) {
+        return switch (idProgType) {
+            case 38 -> "NA TRAMPOLINIH";
+            case 9 -> "NA PLEZALNIH STENAH";
+            case 39 -> "NA KARTINGU" ;
+            case 41 -> "NA IZZIVIH";
+            case 42 -> "V ESCAPE ROOM-U";
+            case 43 -> "NA GLOW GOLF-U";
+            case 44 -> "NA BOWLINGU";
+            case 45 -> "NA LASER TAG-U";
+
+            default ->  "";
+        };
+    }
 }
 
 

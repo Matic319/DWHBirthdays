@@ -70,12 +70,6 @@ public class BirthdayInvitations {
     @Column(name = "partyPlaceName")
     private String partyPlaceName;
 
-    @Column(name = "food")
-    private String food;
-
-    @Column(name = "desserts")
-    private String desserts;
-
     @Column(name = "minAge")
     private Integer minAge;
 
@@ -88,11 +82,6 @@ public class BirthdayInvitations {
     @Column(name = "comments")
     private String comments;
 
-    @Column(name = "attractionComments")
-    private String attractionComments;
-
-    @Column(name = "duration")
-    private String duration;
 
     @Column(name = "partyType")
     private String partyType;
@@ -114,5 +103,17 @@ public class BirthdayInvitations {
 
     @Column(name = "extraProgramType")
     private String extraProgramType;
+
+    @Column(name = "commentsForParents")
+    private String commentsForParents;
+
+    @Column(name = "requiredAnimator")
+    private Integer requiredAnimator;
+
+    @Column(name = "idBirthdayProgType")
+    private Integer idBirthdayProgType;
+
+    @Column(name = "idPartyType")
+    private Integer idPartyType;
 
 }

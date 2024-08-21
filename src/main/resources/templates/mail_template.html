@@ -1,6 +1,7 @@
 <! doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="sl">
 <meta charset="UTF-8">
+
 <table width="100%" cellspacing="0" cellpadding="0" role="none" style="font-family:arial,&quot;helvetica neue&quot;,helvetica,sans-serif;background-color:inherit;border-collapse:collapse;border-spacing:0px;padding:0px;margin:0px;width:1476px;background-repeat:repeat;background-position:50% 0%;height:1769.77px">
     <tbody>
     <tr>
@@ -22,7 +23,7 @@
                                                     <tr>
                                                         <td align="center" style="padding:0px;font-size:0px">
                                                             <a href="https://woop.lt.acemlna.com/Prod/link-tracker?notrack=1&amp;redirectUrl=aHR0cHMlM0ElMkYlMkZ3b29wLmZ1biUyRmxqdWJsamFuYS1yb2pzdG5pLWRuZXZpJTJG&amp;sig=29KQiw1S9SgPAByVKq8juFbEBPmJ9Aj25ZLXA9cawEmM&amp;iat=1709293472&amp;a=%7C%7C90284674%7C%7C&amp;account=woop%2Eactivehosted%2Ecom&amp;email=TvRa30dOPXBqn3WoEhPOS8ZrsHEdz1RkfYnyufSvfiRI7gDj%3ApCxnfVg6lCcp%2ByhRovnRSCQ7Gvq01Kai&amp;s=13b53275067047b3d42d1b670d65c02e&amp;i=996A1049A0A7361" style="color:rgb(19,56,190);font-size:14px" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://woop.lt.acemlna.com/Prod/link-tracker?notrack%3D1%26redirectUrl%3DaHR0cHMlM0ElMkYlMkZ3b29wLmZ1biUyRmxqdWJsamFuYS1yb2pzdG5pLWRuZXZpJTJG%26sig%3D29KQiw1S9SgPAByVKq8juFbEBPmJ9Aj25ZLXA9cawEmM%26iat%3D1709293472%26a%3D%257C%257C90284674%257C%257C%26account%3Dwoop%252Eactivehosted%252Ecom%26email%3DTvRa30dOPXBqn3WoEhPOS8ZrsHEdz1RkfYnyufSvfiRI7gDj%253ApCxnfVg6lCcp%252ByhRovnRSCQ7Gvq01Kai%26s%3D13b53275067047b3d42d1b670d65c02e%26i%3D996A1049A0A7361&amp;source=gmail&amp;ust=1721710872732000&amp;usg=AOvVaw0APR7S8q6H18WPBl8kBEgq">
-                                                                <img src="https://ci3.googleusercontent.com/meips/ADKq_NZetdOpJul9RpFwnt9Yeys_EGOwizRJQIkZrn3bV6PfabVy_MPCd1laEcIB2MMVTEBbyXRxSGj0LdHg3HL4-oYRLhS41RBfXillfpH3dxDgS9x-iFKWc7qMcOIi8jy1ZXptw8gAogL41VNrfBMRGw5lqpZoYreyYVBTup91_OeKNF6CUOaichAYD3DIIzC34f_A7PTgcOTRiqlHXLLvKFxSAaPqHJyWPIs-GqTl_liAqdmo-C2ufA=s0-d-e1-ft#https://content.app-us1.com/cdn-cgi/image/dpr=2,fit=scale-down,format=auto,onerror=redirect,width=650/5OxJR/2023/09/12/1ae7cacd-800f-440a-9cc2-fc1c33fd2f3d.jpeg" alt="" width="650" style="display:block;border:0px;outline:none;text-decoration-line:none" class="CToWUd" data-bit="iit">
+                                                                <img class="adapt-img" src="https://content.app-us1.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,width=650,dpr=2/5OxJR/2024/08/07/3ecdd922-5f88-4720-bd94-bfea0423b434.jpeg" alt="" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" data-cf-ir-is-resized="true" width="650">                                          </a>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -36,9 +37,9 @@
                                                                 <br>
                                                             </p>
                                                             <p style="margin:0px;line-height:21px;color:rgb(51,51,51);font-size:14px;text-align:justify">Hvala, ker ste se odlo&#269;ili za organizacijo rojstnodnevne zabave v WOOP!-u.&nbsp; <img data-emoji="🥰" class="an1" alt="🥰" aria-label="🥰" draggable="false" src="https://fonts.gstatic.com/s/e/notoemoji/15.0/1f970/32.png" loading="lazy">&nbsp;Va&scaron;a rezervacija za&nbsp; <b>
-                                                                <span style="background-color:rgb(255,255,0)" th:text="${partyType}"></span>
+                                                                <span th:text="${progType}"></span>
                                                             </b>&nbsp;je potrjena za&nbsp; <b>
-                                                                <span style="background-color:rgb(255,255,0)"><span th:text="${dateFrom}"> ob </span> <span th:text="${startTime}"></span></span>. </b>
+                                                                <span><span th:text="${dateFrom}"></span><span> ob </span> <span th:text="${startTime}"></span></span>. </b>
                                                             </p>
                                                             <p style="margin:0px;line-height:21px;color:rgb(51,51,51);font-size:14px;text-align:justify">
                                                                 <br>
@@ -94,11 +95,14 @@
                                                                 </li>
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
-                                                                        <strong>Izbrani program: </strong>&nbsp;
-                                                                        <span style="text-align:justify;background-color:rgb(255,255,255)">
-                                                  <span style="background-color:rgb(255,255,0)" >
-                                                      <span th:text="${partyType}"></span><span>, cena programa je</span>
-                                                      <span th:text="${price}"></span><span>&#8364; na osebo (minimalno je 10 oseb).</span>
+                                                                        <strong>Izbrani program:</strong>&nbsp;
+                                                                        <span style="text-align:justify;background-color:rgb(237, 250, 254)">
+                                                  <span >
+                                                      <span th:text="${progType}"></span><span> </span><span th:text="${partyType}"></span><span>, cena programa za </span><span th:text="${participantCount}"></span>
+                                                      <span> oseb je </span>
+                                                      <span th:text="${priceForAll}"></span><span>&#8364; vsaka dodatna oseba</span>
+                                                      <span> zna&#353;a</span>
+                                                      <span th:text="${price}"></span><span> &#8364; </span>
                                                   </span>
                                                 </span>
                                                                     </p>
@@ -111,12 +115,12 @@
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
                                                                         <strong>Starost udele&#382;encev:</strong>
-                                                                        <span th:text="${age}"> let</span>
+                                                                        <span th:text="${age}"></span>
                                                                     </p>
                                                                 </li>
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
-                                                                        <strong>Kontaktna oseba:</strong>&nbsp;<span th:text="${parentFullName}"></span>,&nbsp; <span th:text="${phone}"></span>                                                                    </p>
+                                                                        <strong>Kontaktna oseba:</strong>&nbsp;<span th:text="${parentName}"></span>,&nbsp; <span th:text="${phone}"></span>                                                                    </p>
                                                                 </li>
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
@@ -127,12 +131,12 @@
                                                                     <p style="margin:0px;line-height:21px">
                                                                         <strong>&#268;as zaklju&#269;ka zabave:</strong>&nbsp;<span th:text="${endTime}"></span>
                                                                     </p>
-                                                                </li>
+                                                                </li><!--
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
                                                                         <strong>Pogostitev:</strong><span th:text="${food}"> </span><span th:text="${desserts}"></span>
                                                                     </p>
-                                                                </li>
+                                                                </li> -->
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
                                                                         <strong>Posebnosti skupine:</strong><span th:text="${comments}"></span>
@@ -140,8 +144,7 @@
                                                                 </li>
                                                                 <li style="margin-left:0px;line-height:21px;margin-bottom:15px;color:rgb(51,51,51);font-size:14px">
                                                                     <p style="margin:0px;line-height:21px">
-                                                                        <strong>Dodatni animator:</strong>&nbsp; <span style="background-color:rgb(255,255,0)">
-                                                  <u>ni potreben</u> / je potreben </span>&nbsp;zaradi nehomogenosti skupine (dopla&#269;ilo 50 &#8364;). V primeru, da dodatnega animatorja ne &#382;elite, je obvezno spremstvo star&scaron;ev oziroma druge odrasle osebe.
+                                                                        <strong>Dodatni animator:</strong>&nbsp; <span th:text="${requiredAnimator}"></span>
                                                                     </p>
                                                                 </li>
                                                             </ul>

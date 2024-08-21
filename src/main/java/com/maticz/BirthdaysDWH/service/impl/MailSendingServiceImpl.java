@@ -8,12 +8,6 @@ import com.maticz.BirthdaysDWH.service.PDFTextInsertionService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
-import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +23,6 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -178,6 +171,9 @@ public class MailSendingServiceImpl implements MailSendingService {
             mailSenderMatic.send(message);
         }
     }
+
+
+
     private void sendEmail(String toEmail, String childName, byte[] attachment, Integer idLocation, Context context) throws MessagingException {
 
         MimeMessage message = setJavaMailSender(idLocation).createMimeMessage();
@@ -237,7 +233,12 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
 
-    private JavaMailSender setJavaMailSender(Integer idLocation) {
+
+
+
+
+@Override
+    public JavaMailSender setJavaMailSender(Integer idLocation) {
         JavaMailSender mailSender = null;
         switch(idLocation) {
             case 1 ->  mailSender = mailSenderTP;
@@ -251,7 +252,6 @@ public class MailSendingServiceImpl implements MailSendingService {
     }
 
     private String setPriceForPartyType(String partyType) {
-
 
         return switch(partyType){
             case "Super fun zabava" -> "27.50";

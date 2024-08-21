@@ -86,7 +86,7 @@ public class ACServiceImpl implements ACService {
     }
 
     @Override
-    public void sendToACPictureLink(String email, String pictureLink) throws JsonProcessingException {
+    public void sendToACPictureLink(String email, String pictureLink, Integer idLocation) throws JsonProcessingException {
 
         RestTemplate restTemplate = new RestTemplate();
         String baseUrl = "https://woop.activehosted.com/api/3/contact/sync";
@@ -98,6 +98,17 @@ public class ACServiceImpl implements ACService {
 
 
         fieldValues.add(createFieldValueMap("245", pictureLink));
+        if (idLocation == 1) {
+            fieldValues.add(createFieldValueMap("223", "Trampolin park Ljubljana"));
+        }if (idLocation == 2) {
+            fieldValues.add(createFieldValueMap("223","Karting"));
+        }if (idLocation == 3) {
+            fieldValues.add(createFieldValueMap("223","Arena"));
+        }if (idLocation == 5) {
+            fieldValues.add(createFieldValueMap("223","Rudnik"));
+        }if (idLocation == 6) {
+            fieldValues.add(createFieldValueMap("223","Maribor"));
+        }
 
         Map<String, Object> contact = new HashMap<>();
         contact.put("email", email);

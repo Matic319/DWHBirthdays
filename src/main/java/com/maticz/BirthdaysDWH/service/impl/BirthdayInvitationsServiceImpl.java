@@ -29,6 +29,9 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
     @Autowired
     GoogleCalendarInviteServiceImpl googleCalendarInviteService;
 
+    @Autowired
+    BirthdayServiceImpl birthdayService;
+
     private final Logger logger = LoggerFactory.getLogger(BirthdayInvitationsServiceImpl.class);
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. M. yyyy HH:mm:ss");
@@ -39,7 +42,7 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
 
     @Override
     public void mapAndSaveToInvitations(String sheetId, String sheetName, Integer idLocation) throws IOException {
-        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId, sheetName, "B3:AN1200");
+        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId, sheetName, "B3:AP1200");
 
         sheetData.forEach(row -> {
             LocalDate date = LocalDate.parse(row.get(0).toString(), formatterDMYOnly);
@@ -131,12 +134,12 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
                                 comments,attractionComments);
 
                         if (birthdayInvitationsRepository.findByEmailAndDateFromAndIdLocationAndChildName(emailParent, dateFrom, idLocation, childName).isEmpty()) {
-                            setBdayInvitationAndSave(idLocation,
+                           /* setBdayInvitationAndSave(idLocation,
                                     emailParent, dateFrom, childName, age, phone,
                                     emailAnimator, emailExtraAnimator, partyPlaceName,
                                     minAge, maxAge, participantCount, desserts, food,
                                     comments, duration, partyType, attractionComments,
-                                    parentFirstName,parentLastName,dateTo);
+                                    parentFirstName,parentLastName,dateTo);*/
                             if (sendInviteToAnimator) {
                                 try {
                                     googleCalendarInviteService.birthdayInviteToCalendarAndDB(childName, dateFrom, partyPlaceName, emailAnimator,
@@ -221,38 +224,111 @@ public class BirthdayInvitationsServiceImpl implements BirthdayInvitationsServic
         });
     }
 
-    private void setBdayInvitationAndSave(Integer idLocation, String email, LocalDateTime dateFrom, String childName,
-                                          Integer age, String phone, String animatorEmail, String extraAnimatorEmail,
-                                          String partyPlaceName, Integer minAge, Integer maxAge, Integer participantCount,
-                                          String desserts, String food, String comments, String duration, String partyType,
-                                          String attractionComments, String parentFirstName, String parentLastName,
-                                          LocalDateTime dateTo) {
+    @Override
+    public void mapAndSaveEmailInvitationData(String sheetId, String sheetName, Integer idLocation) throws IOException {
+        List<List<Object>> sheetData = googleSheetsService.readSheetRangeFrom(sheetId, sheetName, "B3:AQ1200");
+
+        for (List<Object> row : sheetData) {
+            LocalDate date = LocalDate.of(1999, 1, 1);
+            try {
+                date = LocalDate.parse(row.get(0).toString(), formatterDMYOnly);
+            } catch (DateTimeParseException | NullPointerException e) {
+
+            }
+                if (date.isAfter(LocalDate.now())) {
+                    String sendEmailInvite = row.get(19) != null ? row.get(19).toString() : null;
+                    if (sendEmailInvite != null && sendEmailInvite.equalsIgnoreCase("poslano")) {
+                        String birthdayProgType = row.get(4).toString();
+                        if (!birthdayProgType.toLowerCase().contains("kombo")) {
+                            String parentEmail = row.get(26).toString();
+                            String childName = row.get(20).toString();
+                            Integer participantCount = null;
+                            try {
+                                participantCount = Integer.parseInt(row.get(22).toString());
+                            } catch (NumberFormatException ignored) {
+
+                            }
+                            Integer age = Integer.parseInt(row.get(23).toString());
+                            Integer minAge = Integer.parseInt(row.get(24).toString());
+                            Integer maxAge = Integer.parseInt(row.get(25).toString());
+
+                            String partyType = row.get(5) != null ? row.get(5).toString() : null;
+                            String phone = row.get(27).toString();
+
+                            Integer idBirthdayProgType = birthdayService.getIdBDayProgType(birthdayProgType);
+                            Integer idPartyType = partyType != null ? birthdayService.getIdBirthdayPartyType(partyType) : 0;
+
+                            String commentsForParents = row.get(8) != null ? row.get(8).toString() : null;
+                            String requiredAnimatorString = row.get(41) != null ? row.get(41).toString() : "";
+                            Integer requiredAnimator = null;
+                            if (requiredAnimatorString.equalsIgnoreCase("true")) {
+                                requiredAnimator = 1;
+                            } else {
+                                requiredAnimator = 0;
+                            }
+                            LocalTime startTime;
+                            LocalTime endTime;
+                            try {
+                                startTime = LocalTime.parse(row.get(2).toString(), formatterHM);
+                            } catch (DateTimeParseException e) {
+                                startTime = LocalTime.parse(row.get(2).toString(), formatterHMS);
+                            }
+
+                            try {
+                                endTime = LocalTime.parse(row.get(3).toString(), formatterHM);
+                            } catch (DateTimeParseException e) {
+                                try {
+                                    endTime = LocalTime.parse(row.get(3).toString(), formatterHMS);
+
+                                }catch (DateTimeParseException f ) {
+                                    endTime = startTime.plusHours(3);
+                                }
+                            }
+                            String parentFirstName = row.get(28).toString();
+
+                            LocalDateTime dateFrom = LocalDateTime.of(date, startTime);
+                            LocalDateTime dateTo = LocalDateTime.of(date, endTime);
+                            if (birthdayInvitationsRepository.findByEmailAndDateFromAndIdLocationAndChildName(parentEmail, dateFrom, idLocation, childName).isEmpty()) {
+                                setBdayInvitationAndSave(idLocation, parentEmail, dateFrom, dateTo, childName, idBirthdayProgType, idPartyType, age,
+                                        minAge, maxAge, commentsForParents, requiredAnimator,phone, participantCount, parentFirstName,
+                                        birthdayProgType,partyType);
+                            }
+
+                        }
+
+                    }
+
+                }
+        }
+    }
+
+    private void setBdayInvitationAndSave(Integer idLocation, String parentEmail, LocalDateTime dateFrom, LocalDateTime dateTo,
+                                          String childName, Integer idBirthdayProgType, Integer idPartyType,
+                                          Integer age, Integer minAge, Integer maxAge,
+                                          String commentsForParents, Integer requiredAnimator, String phone,
+                                          Integer participantCount, String parentFirstName, String birthdayProgramType,
+                                          String partyType) {
         BirthdayInvitations bdInv = new BirthdayInvitations();
-        bdInv.setEmail(email);
-        bdInv.setDateFrom(dateFrom);
-        bdInv.setChildName(childName);
-        bdInv.setAge(age);
-        bdInv.setImportTimestamp(LocalDateTime.now());
-        bdInv.setIdLocation(idLocation);
-        bdInv.setPhone(phone);
+
         bdInv.setEmailSent(0);
-        bdInv.setAnimatorInviteSent(0);
-        bdInv.setExtraAnimatorInviteSent(0);
-        bdInv.setAnimatorEmail(animatorEmail);
-        bdInv.setExtraAnimatorEmail(extraAnimatorEmail);
-        bdInv.setPartyPlaceName(partyPlaceName);
+        bdInv.setIdLocation(idLocation);
+        bdInv.setEmail(parentEmail);
+        bdInv.setChildName(childName);
+        bdInv.setIdBirthdayProgType(idBirthdayProgType);
+        bdInv.setIdPartyType(idPartyType);
+        bdInv.setDateFrom(dateFrom);
+        bdInv.setDateTo(dateTo);
+        bdInv.setAge(age);
         bdInv.setMinAge(minAge);
         bdInv.setMaxAge(maxAge);
+        bdInv.setCommentsForParents(commentsForParents);
+        bdInv.setRequiredAnimator(requiredAnimator);
+        bdInv.setImportTimestamp(LocalDateTime.now());
+        bdInv.setPhone(phone);
         bdInv.setParticipantCount(participantCount);
-        bdInv.setDesserts(desserts);
-        bdInv.setFood(food);
-        bdInv.setComments(comments);
-        bdInv.setDuration(duration);
-        bdInv.setPartyType(partyType);
-        bdInv.setAttractionComments(attractionComments);
         bdInv.setParentFirstName(parentFirstName);
-        bdInv.setParentLastName(parentLastName);
-        bdInv.setDateTo(dateTo);
+        bdInv.setProgramType(birthdayProgramType);
+        bdInv.setPartyType(partyType);
         birthdayInvitationsRepository.save(bdInv);
     }
 

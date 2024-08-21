@@ -2,6 +2,7 @@ package com.maticz.BirthdaysDWH.service;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -10,6 +11,11 @@ import java.io.IOException;
 public interface PDFTextInsertionService {
 
     String locationAddress(Integer idLocation);
+
+    void insertText(PDPageContentStream contentStream, String text, float xInches, float yInches,
+                    float pageHeightInPoints, float fontSize, PDDocument document) throws IOException;
+
+    float inchesToPoints(float inches);
 
     void insertTextIntoPdfInvite(String outputFilePath, String age,
                                  String dateFrom, String time,

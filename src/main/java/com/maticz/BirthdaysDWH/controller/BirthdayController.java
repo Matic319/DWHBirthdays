@@ -301,13 +301,5 @@ public class BirthdayController {
     }
 
 
-
-
-    @GetMapping("/writeTEST")
-    public ResponseEntity<String> testWrite() throws IOException{
-        acService.sendToACPictureLink("matic.zigon@woop.fun","test.com");
-        return ResponseEntity.ok("ok");
-    }
-
     }
 

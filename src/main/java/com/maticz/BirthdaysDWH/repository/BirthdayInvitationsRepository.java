@@ -35,7 +35,7 @@ public interface BirthdayInvitationsRepository extends JpaRepository<BirthdayInv
     @Query
             (value ="update birthdayInvitations " +
                     "set emailSent = 1" +
-                    " where email = :email and dateFrom = convert(datetime,:dateFrom,121) and idLocation = :idLocation and childName = :childName" , nativeQuery = true)
+                    " where email = :email and dateFrom = :dateFrom and idLocation = :idLocation and childName = :childName" , nativeQuery = true)
     void updateEmailSent(@Param("idLocation") Integer idLocation,
                          @Param("dateFrom") LocalDateTime dateFrom,
                          @Param("email") String email,
@@ -142,4 +142,11 @@ public interface BirthdayInvitationsRepository extends JpaRepository<BirthdayInv
                                                           @Param("dateFrom") LocalDateTime dateFrom);
 
 
+@Query
+        (value = "select email,childName, age, phone, minAge, maxAge, participantCount, partyType, programType ,\n" +
+                "parentFirstname , requiredAnimator, idBirthdayProgType, idPartyType,commentsForParents, dateFrom, dateTo \n" +
+                "from birthdayInvitations \n" +
+                "where emailSent = 0 \n" +
+                "and idLocation = :idLocation  " , nativeQuery = true)
+    List<Object[]> getInviteData(@Param("idLocation") Integer idLocation);
 }
